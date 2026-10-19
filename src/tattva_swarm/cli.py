@@ -5,6 +5,8 @@ Commands:
   tattva route "prompt" [--tier T]       route one prompt through the tiered router
   tattva memory add|search|recent|count  local persistent memory
   tattva swarm run tasks.json            parallel -> verify -> synthesize (conductor)
+  tattva code run "cmd"                  run one command in the hardened sandbox
+  tattva mcp                             serve MCP tools over stdio
 """
 
 from __future__ import annotations
@@ -89,6 +91,40 @@ def cmd_swarm(args: argparse.Namespace) -> int:
     return 0 if all(r.get("status") == "ok" for r in out.get("results", [])) else 3
 
 
+def cmd_code(args: argparse.Namespace) -> int:
+    from .sandbox import CodeEngineError, run_code
+
+    try:
+        result = run_code(
+            args.cmd,
+            image=args.image,
+            timeout_s=args.timeout,
+            allow_network=args.allow_network,
+            workdir=args.workdir,
+        )
+    except CodeEngineError as exc:
+        print(f"code engine unavailable: {exc}", file=sys.stderr)
+        return 2
+    if args.json:
+        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+    else:
+        print(result.stdout, end="")
+        if result.stderr:
+            print(result.stderr, end="", file=sys.stderr)
+        print(
+            f"[code-engine] backend={result.backend} exit={result.exit_code} "
+            f"timed_out={result.timed_out} wall={result.wall_s}s",
+            file=sys.stderr,
+        )
+    return result.exit_code if result.exit_code >= 0 else 1
+
+
+def cmd_mcp(_args: argparse.Namespace) -> int:
+    from .mcp_server import main as mcp_main
+
+    return mcp_main()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="tattva", description=f"TattvaSwarm {__version__} — sovereign personal AI swarm")
     parser.add_argument("--version", action="version", version=__version__)
@@ -121,6 +157,20 @@ def build_parser() -> argparse.ArgumentParser:
     s_run = swarm_sub.add_parser("run")
     s_run.add_argument("spec", help="path to a tasks.json spec")
     p_swarm.set_defaults(func=cmd_swarm)
+
+    p_code = sub.add_parser("code", help="run code in the hardened sandbox (code engine)")
+    code_sub = p_code.add_subparsers(dest="code_cmd", required=True)
+    c_run = code_sub.add_parser("run")
+    c_run.add_argument("cmd", help="shell command to run inside the sandbox")
+    c_run.add_argument("--image", default=None, help="container image (default python:3.12-slim)")
+    c_run.add_argument("--timeout", type=float, default=30.0, help="wall-clock seconds")
+    c_run.add_argument("--allow-network", action="store_true", help="enable network (off by default)")
+    c_run.add_argument("--workdir", default=None, help="host dir mounted at /work")
+    c_run.add_argument("--json", action="store_true")
+    p_code.set_defaults(func=cmd_code)
+
+    p_mcp = sub.add_parser("mcp", help="serve MCP tools over stdio (wait for a client)")
+    p_mcp.set_defaults(func=cmd_mcp)
 
     return parser
 

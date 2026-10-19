@@ -1,0 +1,14 @@
+{
+  "seed": 7,
+  "counts": {
+    "train": 160,
+    "val": 40,
+    "total": 200
+  },
+  "sha256": {
+    "train.jsonl": "3d323f12a6754f98b84ab0dd844324bb4a219f5af9faf06414ad0fcb208cc165",
+    "val.jsonl": "dcccd7170cc3ed31745d44eaf232f483a28402c87ae34ccdc1e17e386c9df243"
+  },
+  "format": "conversational (messages), last message assistant",
+  "source": "tattva_swarm.router.classify (deterministic parity)"
+}

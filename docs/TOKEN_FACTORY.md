@@ -36,6 +36,10 @@ budgets can be consumed by reasoning tokens before any visible content is
 emitted (observed: `content: null` with a 48-token budget; fine once budget
 was raised). Give headroom, or use them for reasoning-heavy calls.
 
+Re-verificado 2026-10-19 16:24 UTC (same day, second pass): los 3 backends
+responden HTTP 200; con budget de 24 tokens, Nano y Super consumen el budget en
+reasoning (`content: ""`), Ultra responde `ok` — consistente con lo anterior.
+
 ## How to verify yourself
 
 ```bash

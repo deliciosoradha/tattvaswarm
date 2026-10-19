@@ -1,0 +1,18 @@
+[package]
+name = "tattva-engine"
+version = "0.1.0"
+edition = "2021"
+description = "Rust core for TattvaSwarm: deterministic logical-swarm engine + hardened code-execution engine"
+license = "Apache-2.0"
+
+[[bin]]
+name = "tattva-engine"
+path = "src/main.rs"
+
+# std-only by design: builds fully offline, no third-party crates.
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

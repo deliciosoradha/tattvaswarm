@@ -23,3 +23,6 @@ venv/
 .vscode/
 .idea/
 .DS_Store
+
+# Rust engine build artifacts
+engine/target/

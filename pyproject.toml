@@ -16,9 +16,12 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+# Optional adapters — the core stays zero-dependency without these.
+langchain = ["langchain-core>=0.3"]
 
 [project.scripts]
 tattva = "tattva_swarm.cli:main"
+tattva-mcp = "tattva_swarm.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
