@@ -37,6 +37,17 @@ END;
 """
 
 
+def _fts_query(raw: str) -> str:
+    """Turn arbitrary user text into a safe FTS5 MATCH query.
+
+    Every whitespace-separated token becomes a quoted phrase, so FTS5
+    operators (``-``, ``*``, ``NEAR``, column filters, …) are neutralised and
+    treated as literal text; tokens are joined with implicit AND.
+    """
+    tokens = raw.split()
+    return " ".join('"' + t.replace('"', '""') + '"' for t in tokens)
+
+
 class Memory:
     """Local persistent memory. Entries never leave the machine."""
 
@@ -71,6 +82,9 @@ class Memory:
 
     # -- reads -------------------------------------------------------------
     def search(self, query: str, *, limit: int = 5) -> list[dict]:
+        match = _fts_query(query)
+        if not match:
+            return []
         rows = self.conn.execute(
             """
             SELECT e.id, e.created_at, e.kind, e.source, e.text, e.tags,
@@ -81,7 +95,7 @@ class Memory:
             ORDER BY score
             LIMIT ?
             """,
-            (query, limit),
+            (match, limit),
         ).fetchall()
         return [dict(r) for r in rows]
 
