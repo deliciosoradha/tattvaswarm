@@ -77,6 +77,19 @@ the tiered router on Nebius Token Factory:
 
 Backend failures raise instead of fabricating answers (test-asserted).
 
+## 7. Tavily research tier — live (2026-10-19)
+
+`TAVILY_API_KEY=… tattva route "RadhikaChain sovereign L1" --tier research`
+(key supplied from a local secret store; never committed):
+
+- `status=ok` · `tier=research` · model `tavily-search` · **5 results** · **0.33 s**
+  (an earlier run of the same command: 5 results, 1.66 s)
+- Without `TAVILY_API_KEY`, the same tier exits `rc=3` with
+  `research backend not configured (TAVILY_API_KEY missing)` — exact reason,
+  no fabricated answer.
+
+This is the bonus Tavily runtime call referenced in `docs/SUBMISSION.md`.
+
 ## Honesty notes
 
 - The pure-Python reference is ~4 orders of magnitude slower than the GPU

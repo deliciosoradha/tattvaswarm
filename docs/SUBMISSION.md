@@ -36,8 +36,9 @@ architectural property, not a privacy toggle.
 
 - **Tiered router** (deterministic classification): `small` runs locally and
   never touches the network; `normal`, `reasoning` and `heavy` route to
-  Nemotron Nano / Super / Ultra on Token Factory; `research` is optional
-  Tavily search. No key → exact-reason errors, never fabricated answers.
+  Nemotron Nano / Super / Ultra on Token Factory; `research` is a live
+  Tavily search (verified 2026-10-19: 5 results in 0.33 s). No key →
+  exact-reason errors, never fabricated answers.
 - **Local memory**: SQLite + FTS5 — persistent, searchable, and it physically
   has nowhere to sync to.
 - **Swarm conductor**: a task graph executed as parallel workers → verifier
@@ -78,6 +79,8 @@ submission window; `docs/HACKATHON.md` lists exactly what was updated.
   answer for under 3k tokens.
 - Deterministic engine checksums, so anyone can verify the reference run.
 - A sanitization gate we actually ran before publishing (report included).
+- Bonus eligibility verified: the same router executed a live Tavily research
+  call (5 results, 0.33 s) with the key kept out of the repository.
 
 ## "What we learned"
 
@@ -97,7 +100,7 @@ calls) that the tiered design pays for itself immediately.
 
 Python 3.12 (stdlib only) · Nebius Token Factory (OpenAI-compatible API) ·
 NVIDIA Nemotron 3 — Nano-30B-A3B, Super-120B-a12b, Ultra-550B-a55b ·
-SQLite FTS5 · Docker (demo) · Apache-2.0.
+Tavily Search API · SQLite FTS5 · Docker (demo) · Apache-2.0.
 
 ## Links
 
