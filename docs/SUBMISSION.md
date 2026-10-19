@@ -20,8 +20,7 @@ machines, not processes.
 
 ## Track
 
-Personal AI — *final confirmation ≤ Oct 25, once the live demo URL is up*
-(alternate: Best Apps and Agents).
+Personal AI (confirmed 2026-10-19).
 
 ## "Inspiration"
 
