@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Environment / secrets — NEVER commit
+.env
+.env.*
+!.env.example
+
+# Local state (sovereign data stays local)
+.tattva/
+*.sqlite3
+*.db
+.runs/
+
+# Notebooks & editors
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store

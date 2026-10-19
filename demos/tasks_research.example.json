@@ -1,0 +1,22 @@
+{
+  "goal": "Explain why local-first personal AI matters, with concrete trade-offs.",
+  "tasks": [
+    {
+      "id": "t1",
+      "prompt": "In two sentences: what does local-first mean for a personal AI system?",
+      "tier": "normal"
+    },
+    {
+      "id": "t2",
+      "prompt": "List three concrete trade-offs of running AI locally versus fully in the cloud. Be brief.",
+      "tier": "reasoning"
+    },
+    {
+      "id": "t3",
+      "prompt": "In two sentences: what is a logical worker swarm and why is it cheaper than one process per agent?",
+      "tier": "normal"
+    }
+  ],
+  "verify": true,
+  "synthesize": true
+}
