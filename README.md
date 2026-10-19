@@ -41,7 +41,7 @@ a local ledger.
 ## Quickstart (tested)
 
 ```bash
-git clone «repo URL» tattva-swarm && cd tattva-swarm
+git clone https://github.com/deliciosoradha/tattvaswarm.git && cd tattvaswarm
 
 python3 -m venv .venv && . .venv/bin/activate   # Debian/Ubuntu: sudo apt install python3-venv
 pip install -e .                                 # zero runtime dependencies

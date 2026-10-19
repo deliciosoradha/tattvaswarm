@@ -103,7 +103,7 @@ Tavily Search API · SQLite FTS5 · Docker (demo) · Apache-2.0.
 
 ## Links
 
-- Repository: `«repo URL — GitLab/GitHub, public, license visible»`
+- Repository: `https://github.com/deliciosoradha/tattvaswarm` (public, Apache-2.0)
 - Live demo: `«demo URL — HF Space, runs a real Token Factory call»`
 - Video (< 3 min, EN): `«YouTube URL»`
 
