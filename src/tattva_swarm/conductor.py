@@ -65,7 +65,7 @@ def _verify(task: dict, result: dict, client: TokenFactoryClient, fast_model: st
         return {"id": result.get("id"), "verdict": "SKIPPED", "reason": "no fast model configured for verification", "usage": {}}
     prompt = _VERIFY_PROMPT.format(task=task.get("prompt", "")[:2000], answer=result.get("reply", "")[:4000])
     try:
-        r = client.chat([{"role": "user", "content": prompt}], fast_model, temperature=0, max_tokens=200)
+        r = client.chat([{"role": "user", "content": prompt}], fast_model, temperature=0, max_tokens=600)
     except BackendError as exc:
         return {"id": result.get("id"), "verdict": "ERROR", "reason": str(exc), "usage": {}}
     verdict_text = (r.text or "").strip()
