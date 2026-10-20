@@ -8,7 +8,7 @@
     },
     {
       "id": "t2",
-      "prompt": "List three concrete trade-offs of running AI locally versus fully in the cloud. Be brief.",
+      "prompt": "List exactly three concrete trade-offs (costs or downsides) of running AI locally instead of fully in the cloud. Use a numbered list and be brief.",
       "tier": "reasoning"
     },
     {
