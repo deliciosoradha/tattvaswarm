@@ -1,9 +1,11 @@
 # Devpost submission — draft (EN)
 
-> Draft for the Nebius × NVIDIA Global AI Hackathon 2026 form. Fill the
-> `«…»` placeholders right before submitting (repo / demo / video URLs).
-> Keep every claim matched to `docs/EVIDENCE.md` — no numbers that were not
-> measured.
+> Status: the form was submitted on 2026-10-19 (5/5) and remains editable.
+> The **repository URL is final**. The **video field still points to the previous
+> video** and must be replaced after the 2:03 MP4 is uploaded to YouTube. There is
+> **no hosted interactive demo**: the hackathon build is a CLI and the demo is the
+> recorded run. Every claim is matched to `docs/EVIDENCE.md` — no numbers that were
+> not measured.
 
 ---
 
@@ -15,7 +17,8 @@ TattvaSwarm — a sovereign personal AI swarm
 
 A personal AI that is sovereign by construction: local-first memory, a
 deterministic tiered router, and NVIDIA Nemotron models on Nebius Token
-Factory — plus a logical swarm engine that runs millions of workers as state
+Factory or any OpenAI-compatible backend (the recorded demo uses NVIDIA NIM)
+— plus a logical swarm engine that runs millions of workers as state
 machines, not processes.
 
 ## Track
@@ -28,15 +31,17 @@ Personal AI in 2026 means rent-a-brain: your notes, your memory, your
 thinking, all in someone else's cloud. We wanted the opposite starting
 point — an assistant whose default is *local*, whose outbound calls are an
 explicit, auditable allowlist, and whose brain is open models (NVIDIA
-Nemotron) served through Nebius Token Factory. Sovereignty should be an
-architectural property, not a privacy toggle.
+Nemotron) served through an OpenAI-compatible backend — Nebius Token Factory,
+with NVIDIA NIM as the drop-in fallback used for the recorded demo. Sovereignty
+should be an architectural property, not a privacy toggle.
 
 ## "What it does"
 
 - **Tiered router** (deterministic classification): `small` runs locally and
   never touches the network; `normal`, `reasoning` and `heavy` route to
-  Nemotron Nano / Super / Ultra on Token Factory; `research` is a live
-  Tavily search (verified 2026-10-19: 5 results in 0.33 s). No key →
+  Nemotron fast / Super / heavy models (Token Factory: Nano / Super / Ultra;
+  the recorded demo on NVIDIA NIM: Lightning / Super / Super); `research` is a
+  live Tavily search (verified 2026-10-19: 5 results in 0.33 s). No key →
   exact-reason errors, never fabricated answers.
 - **Local memory**: SQLite + FTS5 — persistent, searchable, and it physically
   has nowhere to sync to.
@@ -53,11 +58,12 @@ architectural property, not a privacy toggle.
 ## "How we built it"
 
 Python 3.12 standard library only — zero runtime dependencies (`urllib` for
-the OpenAI-compatible Token Factory API). The CLI (`tattva doctor/route/
-memory/swarm`) drives the same code path as the live demo. Everything is
-measured: model smoke tests (`HTTP 200`, latencies, token usage), the
-conductor run (~2.3–2.6k tokens end-to-end), and the swarm engine with
-verifiable checksums. The public repository was created during the
+the OpenAI-compatible API). The same client talks to **Nebius Token Factory**
+and **NVIDIA NIM**; only `NEBIUS_BASE_URL` and the model IDs change. The CLI
+(`tattva doctor/route/memory/swarm`) drives the same code path as the recorded
+demo. Everything is measured: model smoke tests (`HTTP 200`, latencies, token
+usage), the conductor run (~2.3–2.6k tokens end-to-end), and the swarm engine
+with verifiable checksums. The public repository was created during the
 submission window; `docs/HACKATHON.md` lists exactly what was updated.
 
 ## "Challenges we ran into"
@@ -74,8 +80,9 @@ submission window; `docs/HACKATHON.md` lists exactly what was updated.
 
 - Verified live tier map on Token Factory: Nano / Super / Ultra, with
   smoke evidence checked into the repo.
-- A conductor run where all workers verified and Ultra synthesised the final
-  answer for under 3k tokens.
+- A conductor run where all workers verified and the heavy tier synthesised the
+  final answer for under 3k tokens (Ultra on Token Factory; Super in the
+  recorded NVIDIA NIM demo).
 - Deterministic engine checksums, so anyone can verify the reference run.
 - A sanitization gate we actually ran before publishing (report included).
 - Bonus eligibility verified: the same router executed a live Tavily research
@@ -98,14 +105,19 @@ calls) that the tiered design pays for itself immediately.
 ## "Built with"
 
 Python 3.12 (stdlib only) · Nebius Token Factory (OpenAI-compatible API) ·
-NVIDIA Nemotron 3 — Nano-30B-A3B, Super-120B-a12b, Ultra-550B-a55b ·
+NVIDIA NIM (recorded demo, OpenAI-compatible) · NVIDIA Nemotron 3 —
+Nano-30B-A3B / 3.5-Lightning-30B-A3B, Super-120B-a12b, Ultra-550B-a55b ·
 Tavily Search API · SQLite FTS5 · Docker (demo) · Apache-2.0.
 
 ## Links
 
 - Repository: `https://github.com/deliciosoradha/tattvaswarm` (public, Apache-2.0)
-- Live demo: `«demo URL — HF Space, runs a real Token Factory call»`
-- Video (< 3 min, EN): `«YouTube URL»`
+- Demo: local CLI + 2:03 screen recording; **no hosted interactive demo** (no
+  cloud spend). Run `pip install -e . && tattva doctor`; the quickstart is in
+  the README. The YouTube URL is added after the operator uploads the MP4.
+- Video (< 3 min, EN): 123.0 s, 1280×720, burned English captions + SRT/VTT;
+  YouTube upload pending. The Devpost video field currently points to the
+  previous video and must be replaced.
 
 ## Nebius feedback (honest & specific — $100 bonus section)
 
@@ -122,5 +134,10 @@ Tavily Search API · SQLite FTS5 · Docker (demo) · Apache-2.0.
   3. A first-class "from-this-repo" deploy path (one command from a public
      repo to a serverless endpoint) would have let us ship the demo on Nebius
      infrastructure directly and cut our deploy step to minutes.
+- **Credits note (honest)**: at recording time the Token Factory project key
+  returned **HTTP 402** and the demo moved to **NVIDIA NIM** with no code
+  changes beyond the base URL and model IDs. That drop-in compatibility is a
+  strength of the OpenAI surface, but a clearer low-credit warning in the
+  console would have saved a debugging cycle.
 - **Net**: we would build on Token Factory again; the friction points above
   are docs/metadata-level, not architectural.

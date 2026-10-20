@@ -1,8 +1,11 @@
 # TattvaSwarm — a sovereign personal AI swarm
 
 > **Status (Oct 2026):** built for the [Nebius × NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/rules).
-> Every command below was run against live **Nebius Token Factory** with **NVIDIA Nemotron**
-> models; the measured numbers and their conditions live in [`docs/EVIDENCE.md`](docs/EVIDENCE.md).
+> The CLI runs against any OpenAI-compatible Nemotron backend. The included demo video was
+> recorded on **NVIDIA NIM** (`https://integrate.api.nvidia.com/v1`) because the Nebius Token
+> Factory project credit returned **HTTP 402** at recording time; the same CLI runs on Token
+> Factory with `NEBIUS_BASE_URL=https://api.tokenfactory.nebius.com/v1/`. Token Factory runs,
+> model IDs and measured numbers live in [`docs/EVIDENCE.md`](docs/EVIDENCE.md).
 > Honest states only — nothing here is aspirational fiction.
 
 TattvaSwarm is a **local-first personal AI system**: a deterministic tiered router, persistent
@@ -14,9 +17,10 @@ a local ledger.
 ## What it does
 
 - **Tiered routing** — `small` is answered locally and never touches the network; `normal` →
-  Nemotron Nano, `reasoning` → Nemotron Super, `heavy` → Nemotron Ultra (all on Nebius Token
-  Factory); `research` is optional Tavily search. A missing or misconfigured backend returns a
-  structured error with the **exact reason** — it never invents an answer.
+  a fast Nemotron (Nano on Token Factory; Lightning on NVIDIA NIM), `reasoning` → Nemotron
+  Super, `heavy` → Super/Ultra depending on the backend; `research` is optional Tavily search.
+  A missing or misconfigured backend returns a structured error with the **exact reason** —
+  it never invents an answer.
 - **Evidence-backed swarm engine** — logical workers as deterministic, checksummed state
   machines: 100,000 workers in 4.25 s in pure Python on a 4-core host; the scaled engine measured
   **108,000,000 logical workers in 5.8007 s** on an A100-40GB (54,000,000 in 2.8671 s on a T4).
@@ -46,10 +50,17 @@ git clone https://github.com/deliciosoradha/tattvaswarm.git && cd tattvaswarm
 python3 -m venv .venv && . .venv/bin/activate   # Debian/Ubuntu: sudo apt install python3-venv
 pip install -e .                                 # zero runtime dependencies
 
-export NEBIUS_API_KEY=...   # https://tokenfactory.nebius.com/  (or: ~/.tattva/nebius.env)
+# Token Factory (default): key from https://tokenfactory.nebius.com/
+export NEBIUS_API_KEY=...
+# NVIDIA NIM (the recorded demo): use an NVIDIA API key and override the base URL/models.
+# export NEBIUS_API_KEY=<nvidia key>
+# export NEBIUS_BASE_URL=https://integrate.api.nvidia.com/v1
+# export TATTVA_MODEL_FAST=nvidia/nemotron-3.5-lightning-30b-a3b
+# export TATTVA_MODEL_REASONING=nvidia/nemotron-3-super-120b-a12b
+# export TATTVA_MODEL_HEAVY=nvidia/nemotron-3-super-120b-a12b
 
 tattva doctor                 # key present? tiers? backend reachable?
-tattva route "Say hello in one short line."                              # → Nemotron Nano
+tattva route "Say hello in one short line."                              # → normal tier (Nano on Token Factory; Lightning on NVIDIA NIM)
 tattva route "Analyze the trade-offs of local-first AI" --tier reasoning # → Nemotron Super
 tattva memory add "The router prefers Nano for everyday calls" --kind note
 tattva memory search Nano
@@ -78,15 +89,18 @@ PYTHONPATH=src python3 -m tattva_swarm.mcp_server   # 6 tools for any MCP client
 
 ```bash
 python3 demos/demo_assistant.py       # recall → route → reply → remember
-python3 demos/demo_swarm_research.py  # 3 parallel workers → verifier → Ultra synthesis
+python3 demos/demo_swarm_research.py  # 3 parallel workers → verifier → heavy-tier synthesis
 python3 demos/demo_mass_swarm.py      # logical swarm engine: 100k → 1M workers
 ```
 
-### Live demo
+### Demo video
 
-**`«demo URL»`** — the same router behind a tiny stdlib web app, deploying to **Nebius AI
-Cloud** as a CPU serverless endpoint (one command: [`deploy_nebius.sh`](deploy_nebius.sh));
-HF Space fallback prepared in [`spaces/`](spaces/) (`deploy_hf.sh`). Rate-limited either way.
+The hackathon build is a CLI; there is **no hosted interactive demo** (no cloud spend).
+The submitted **2:03** screen recording has burned English captions; the complete SRT/VTT
+are supplied with the Devpost entry. Run the same commands locally with the quickstart
+above. A CPU serverless endpoint script and an HF Space fallback are included for
+reference ([`deploy_nebius.sh`](deploy_nebius.sh), [`spaces/`](spaces/)), but they are not
+deployed.
 
 ## Post-training on Token Factory
 
@@ -119,7 +133,7 @@ statuses and merge evidence: [`docs/POST_TRAINING.md`](docs/POST_TRAINING.md).
 ## Verify it yourself
 
 ```bash
-python3 -m pytest -q tests/                            # 50 offline tests, 2 skipped — no key needed
+python3 -m pytest -q tests/                            # 54 offline tests, 3 skipped — no key needed
 bash scripts/sanitize_check.sh                         # pre-push secrets/PII scan → CLEAN
 python3 scripts/smoke_token_factory.py --list-models   # live catalog check
 ```
