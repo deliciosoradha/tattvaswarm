@@ -27,6 +27,10 @@ Poll 2026-10-19 16:18 UTC (`--poll`): ambos jobs siguen `running` con
 `trained_steps=0`, `total_steps=null`, `trained_tokens=0` — la API aún no
 reporta pasos de entrenamiento para ninguno. Sin números inventados.
 
+Poll 2026-10-19 16:46 UTC (`--poll`): idem — `status=running`,
+`trained_steps=0`, `total_steps=null`, `trained_tokens=0`, `error=null` en
+ambos jobs.
+
 Both jobs reuse the same uploaded dataset/validation files. Hard datum from the live API
 (better than the docs): the minimum `context_length` for fine-tuning is **8192** — a
 request with 4096 is rejected with HTTP 422.
