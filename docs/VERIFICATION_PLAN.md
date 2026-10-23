@@ -137,8 +137,10 @@ done
 # esperado: 3 líneas status=ok con contenido no vacío
 ```
 
-### C5. Video en Devpost (MANUAL)
-- Subir MP4 (2:03) a YouTube, pegar URL en el campo Video.
+### C5. Video en Devpost (ASSET CREADO — upload manual)
+- Asset listo en `devpost-assets/tattvaswarm-demo.mp4` (136 s, captions quemados) +
+  `.srt`/`.vtt` + thumbnail 1200x800. Falta subir el MP4 a YouTube y pegar la URL
+  en el campo Video de Devpost (manual, sin credenciales de agente).
 - **Verificación:** el embed de la página ya no es `Jm4v_h4DW7o`.
 
 ## D. Git — estado de ramas
