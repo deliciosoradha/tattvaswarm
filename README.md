@@ -14,6 +14,10 @@ logical swarm engine that runs millions of workers as compact state machines —
 Only the inference calls you allow ever leave the machine, and every one of them is recorded in
 a local ledger.
 
+## Live demo (GitHub Pages)
+
+https://deliciosoradha.github.io/tattvaswarm/ — deterministic router in the browser + live NVIDIA NIM calls through a Cloudflare Worker proxy (API key stays server-side). No install required.
+
 ## What it does
 
 - **Tiered routing** — `small` is answered locally and never touches the network; `normal` →

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dharmagate Agentic Shield (TattvaSwarm) — live demo</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:64rem;margin:2rem auto;padding:0 1rem;background:#0b0f14;color:#e6edf3;line-height:1.55}
+h1{font-size:1.6rem;margin:0 0 .2rem}
+h2{font-size:1.15rem;margin:2rem 0 .6rem;border-bottom:1px solid #21262d;padding-bottom:.3rem}
+p.sub{color:#8b949e;margin:0 0 1.2rem}
+.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:1rem;margin:.8rem 0}
+textarea{width:100%;height:5.5rem;background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:8px;padding:.6rem;font:inherit;resize:vertical}
+select,button{font:inherit;padding:.45rem .8rem;border-radius:8px;border:1px solid #30363d;background:#21262d;color:#e6edf3}
+button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}
+#go,#live{background:#1f6feb;border-color:#1f6feb;font-weight:600}
+.row{display:flex;gap:.5rem;align-items:center;margin:.6rem 0;flex-wrap:wrap}
+pre{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:.8rem;overflow:auto;white-space:pre-wrap;min-height:4rem;font-size:.85rem}
+.meta{color:#8b949e;font-size:.85rem}
+a{color:#58a6ff}
+.badge{display:inline-block;background:#21262d;border:1px solid #30363d;border-radius:6px;padding:.1rem .45rem;font-size:.75rem;margin-right:.3rem}
+.tier-small{color:#3fb950}.tier-normal{color:#58a6ff}.tier-reasoning{color:#d29922}.tier-heavy{color:#f85149}.tier-research{color:#bc8cff}
+table{width:100%;border-collapse:collapse;font-size:.85rem}th,td{border:1px solid #30363d;padding:.4rem .6rem;text-align:left}th{background:#21262d}
+.note{color:#8b949e;font-size:.8rem;margin-top:.4rem}
+</style>
+</head>
+<body>
+<h1>Dharmagate Agentic Shield <span class="badge">= TattvaSwarm</span></h1>
+<p class="sub">Sovereign personal AI swarm — deterministic tiered routing on NVIDIA Nemotron (via NVIDIA NIM),
+local-only memory, compact logical swarms, hardened code sandbox. Honest failures: never a fabricated answer.
+<br>GitLab Pages → now GitHub Pages · backend proxied through a Cloudflare Worker · API key stays server-side.</p>
+<p class="meta">
+<a href="https://github.com/deliciosoradha/tattvaswarm">GitHub repo</a> ·
+<a href="https://devpost.com/software/dharmagate-agentic-shield">Devpost entry</a> ·
+<a href="https://github.com/deliciosoradha/tattvaswarm">GitLab project</a>
+</p>
+
+<h2>1. Deterministic router (runs in your browser — zero network)</h2>
+<div class="card">
+  <textarea id="p1" placeholder="Try: 'Analyze the trade-offs of local-first AI vs cloud-only assistants.'"></textarea>
+  <div class="row"><button id="classify">Classify →</button><span id="m1" class="meta"></span></div>
+  <pre id="o1">(no classification yet)</pre>
+  <p class="note">Same keyword rules as <code>src/tattva_swarm/router.py::classify</code>. Same input → same tier, always. No LLM call for <code>small</code>.</p>
+</div>
+
+<h2>2. Live NIM (through the proxy)</h2>
+<div class="card">
+  <textarea id="p2" placeholder="Ask something that needs a model…"></textarea>
+  <div class="row">
+    <label>tier <select id="t2"><option>auto</option><option>small</option><option>normal</option><option>reasoning</option><option>heavy</option></select></label>
+    <label>max_tokens <input id="mt" type="number" value="768" min="64" max="2048" style="width:6rem;background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:.3rem"></label>
+    <button id="live">Ask NIM →</button><span id="m2" class="meta"></span>
+  </div>
+  <pre id="o2">(no request yet)</pre>
+  <p class="note">Calls <code>tattva-nim-proxy.axelpadilla98.workers.dev</code> which holds the NVIDIA API key as a secret and forwards to
+  <code>integrate.api.nvidia.com</code>. Tier map: normal → nemotron-3.5-lightning-30b-a3b · reasoning → nemotron-3.5-super-vl-120b-a12b · heavy → nemotron-3-ultra-550b-a55b.</p>
+</div>
+
+<h2>3. Measured evidence (from <code>docs/EVIDENCE.md</code>)</h2>
+<div class="card">
+<table>
+<tr><th>Claim</th><th>Measured</th><th>Conditions</th></tr>
+<tr><td>Logical swarm — scaled engine</td><td>108,000,000 workers in 5.8007 s</td><td>A100-SXM4-40GB, 2026-10-18</td></tr>
+<tr><td>Logical swarm — scaled engine</td><td>54,000,000 workers in 2.8671 s</td><td>Tesla T4, 2026-10-18</td></tr>
+<tr><td>Reference engine (Python)</td><td>100,000 workers in 4.2498 s · checksum 45f348f1ab454d00</td><td>4-core host, no GPU, 2026-10-19</td></tr>
+<tr><td>Rust core (bit-identical)</td><td>100,000 workers in 0.0303 s (~140×)</td><td>std-only, offline build, 2026-10-19</td></tr>
+<tr><td>Token Factory smoke</td><td>28 models, 5 Nemotron · Nano 2.864 s · Super 1.943 s · Ultra 1.561 s</td><td>HTTP 200, 2026-10-19</td></tr>
+<tr><td>Conductor end-to-end</td><td>~2.3–2.6 k tokens, all workers VERIFIED</td><td>3 parallel workers, 2026-10-19</td></tr>
+<tr><td>Tavily research tier</td><td>5 results in 0.33 s</td><td>live, 2026-10-19</td></tr>
+</table>
+<p class="note">Every number above is reproduced by <code>python3 demos/demo_mass_swarm.py</code> (checksum) and <code>docs/EVIDENCE.md</code>. Nothing is estimated.</p>
+</div>
+
+<h2>4. Quickstart (run it yourself)</h2>
+<div class="card">
+<pre>git clone https://github.com/deliciosoradha/tattvaswarm.git
+cd tattvaswarm
+pip install -e .                      # zero runtime dependencies
+export NEBIUS_API_KEY=...              # or an NVIDIA API key + base URL override
+tattva doctor
+tattva route "Analyze the trade-offs of local-first AI" --tier reasoning
+tattva memory add "the router prefers Nano for everyday calls"
+tattva memory search Nano</pre>
+</div>
+
+<script>
+const RESEARCH_HINTS = ["search the web","busca en la web","latest news","últimas noticias","ultimas noticias","current price","precio actual","investiga en","look up online","search online"];
+const HEAVY_HINTS = ["synthesize","sintetiza","whitepaper","full report","informe completo","long document","documento largo","plan completo","estrategia completa","deep dive"];
+const REASONING_HINTS = ["analyze","analiza","analyse","compare","compara","why","por que","por qué","step by step","paso a paso","prove","demuestra","evaluate","evalúa","evalua","diagnose","diagnostica","reason","razona","trade-off","tradeoff","debug"];
+function classify(prompt){
+  const p = prompt.toLowerCase();
+  if (RESEARCH_HINTS.some(h=>p.includes(h))) return {tier:"research",reason:"external information requested"};
+  if (HEAVY_HINTS.some(h=>p.includes(h)) || prompt.length>4000) return {tier:"heavy",reason:"long synthesis requested"};
+  if (REASONING_HINTS.some(h=>p.includes(h)) || prompt.length>1200) return {tier:"reasoning",reason:"reasoning cues or long prompt"};
+  return {tier:"normal",reason:"everyday call (default tier)"};
+}
+const TIER_COLOR = {small:"tier-small",normal:"tier-normal",reasoning:"tier-reasoning",heavy:"tier-heavy",research:"tier-research"};
+function show(id, text, meta){ document.getElementById(id).textContent=text; if(meta) document.getElementById(meta).textContent=meta; }
+
+document.getElementById("classify").addEventListener("click",()=>{
+  const prompt = document.getElementById("p1").value.trim();
+  if(!prompt){ show("o1","(empty prompt)"); return; }
+  const d = classify(prompt);
+  show("o1", JSON.stringify({tier:d.tier, classification:d.reason, prompt_length:prompt.length}, null, 2));
+  document.getElementById("m1").innerHTML = `→ <span class="${TIER_COLOR[d.tier]}">${d.tier}</span>`;
+});
+
+const PROXY = "https://tattva-nim-proxy.axelpadilla98.workers.dev";
+document.getElementById("live").addEventListener("click", async ()=>{
+  const prompt = document.getElementById("p2").value.trim();
+  if(!prompt){ show("o2","(empty prompt)"); return; }
+  const tier = document.getElementById("t2").value;
+  const maxTokens = parseInt(document.getElementById("mt").value,10)||768;
+  const btn = document.getElementById("live"); btn.disabled=true;
+  document.getElementById("m2").textContent = "calling NIM…";
+  const t0 = performance.now();
+  try {
+    const r = await fetch(PROXY + "/api/route", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({prompt, tier, max_tokens: maxTokens})
+    });
+    const d = await r.json();
+    const dt = ((performance.now()-t0)/1000).toFixed(2);
+    show("o2", JSON.stringify(d, null, 2));
+    const cls = TIER_COLOR[d.tier]||"";
+    document.getElementById("m2").innerHTML = r.ok
+      ? `→ <span class="${cls}">${d.tier}</span> · ${d.model} · ${dt}s`
+      : `→ error ${r.status}`;
+  } catch (e) {
+    show("o2", "network error: " + e);
+    document.getElementById("m2").textContent = "failed";
+  } finally { btn.disabled=false; }
+});
+</script>
+</body>
+</html>
