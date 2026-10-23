@@ -74,13 +74,17 @@ resolución de la EDP física.
 
 ## 3. Notebook incluido
 
-`notebooks/tattva_swarm_capacity_benchmark.ipynb` — re-ejecutado en este host:
+`notebooks/tattva_swarm_capacity_benchmark.ipynb` — re-ejecutado en este host (CPU) y
+cargado en Colab (GPU) vía MCP. La ejecución en Colab se completó pero el MCP no
+retransmite stdout de forma fiable (`outputs: []`), por lo que los números de GPU
+deben leerse directamente en la UI de Colab por el operador. La celda 3 (GPU) usa
+`torch.cuda.is_available()` y reporta TFLOP/s; la celda 4 (cola) reporta tasks/s.
 
 | Celda | Resultado | Criterio | Estado |
 |---|---|---|---|
 | 0 entorno | py3.14, sin torch, sin GPU, 7.0 GB RAM | — | declarado |
 | 1 CPU matmul | 8.54 GFLOP/s | > 10 | ⚠️ no cumple (host lento) |
-| 2 GPU | omitido (sin GPU) | > 1 TFLOP/s | omitido |
+| 2 GPU | pendiente de lectura en Colab (MCP no retransmite stdout) | > 1 TFLOP/s | pendiente |
 | 3 cola 4w×2k | 2000/2000, 17.2/s, 0 errores | ≥ 100/s | ⚠️ no cumple (CPU-bound por SHA-256) |
 | 4 nativo (guard) | skip (sin tarball) | rc=0 | omitido |
 
