@@ -110,14 +110,16 @@ Nano-30B-A3B / 3.5-Lightning-30B-A3B, Super-120B-a12b, Ultra-550B-a55b ·
 Tavily Search API · SQLite FTS5 · Docker (demo) · Apache-2.0.
 
 ## Links
-
 - Repository: `https://github.com/deliciosoradha/tattvaswarm` (public, Apache-2.0)
-- Demo: local CLI + 2:03 screen recording; **no hosted interactive demo** (no
-  cloud spend). Run `pip install -e . && tattva doctor`; the quickstart is in
-  the README. The YouTube URL is added after the operator uploads the MP4.
+- Live demo (GitHub Pages): `https://deliciosoradha.github.io/tattvaswarm/` — deterministic router
+  in the browser + live NVIDIA NIM calls through a Cloudflare Worker proxy (API key stays
+  server-side). No install required.
+- Demo: local CLI + 2:03 screen recording. Run `pip install -e . && tattva doctor`; the
+  quickstart is in the README.
 - Video (< 3 min, EN): 123.0 s, 1280×720, burned English captions + SRT/VTT;
-  YouTube upload pending. The Devpost video field currently points to the
-  previous video and must be replaced.
+  **the Devpost video field currently points to an unrelated video**
+  (`DHARMAGATE:krittika`, YouTube `Jm4v_h4DW7o`) and MUST be replaced with the TattvaSwarm
+  recording before judging.
 
 ## Nebius feedback (honest & specific — $100 bonus section)
 
