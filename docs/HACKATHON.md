@@ -47,7 +47,8 @@ is what changed or was created *during* the window:
 
 - Working: router tiers (small/normal/reasoning/heavy), Token Factory calls,
   memory, conductor, CLI, demos, live demo deployment (see README links).
-- Not run / not claimed: `research` tier (needs a Tavily key — honest error),
-  vision tier (Super-VL evaluated for optional demos only).
+- `research` tier: verified live (docs/EVIDENCE.md §7) — 5 results in 0.33 s with a
+  TAVILY_API_KEY; without the key it returns the exact reason (no fabrication).
+- Not run / not claimed: vision tier (Super-VL evaluated for optional demos only).
 - Every performance number in this repo is a measured number with date and
   conditions — see `docs/EVIDENCE.md`.

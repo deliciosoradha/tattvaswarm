@@ -53,7 +53,7 @@ def _usage_sum(*dicts: dict | None) -> int:
 
 
 def _run_task(task: dict, client: TokenFactoryClient) -> dict:
-    out = route(task["prompt"], tier=task.get("tier", "auto"), client=client)
+    out = route(task.get("prompt", ""), tier=task.get("tier", "auto"), client=client)
     out["id"] = task.get("id", "?")
     return out
 
@@ -69,7 +69,10 @@ def _verify(task: dict, result: dict, client: TokenFactoryClient, fast_model: st
     except BackendError as exc:
         return {"id": result.get("id"), "verdict": "ERROR", "reason": str(exc), "usage": {}}
     verdict_text = (r.text or "").strip()
-    ok = verdict_text.upper().startswith("VERIFIED")
+    # The verifier contract is to reply with EXACTLY `VERIFIED` or
+    # `REJECTED: <reason>`. Accept only an exact VERIFIED so that a reply like
+    # "VERIFIED but actually wrong" is not mistaken for a pass.
+    ok = verdict_text.upper() == "VERIFIED"
     return {
         "id": result.get("id"),
         "verdict": "VERIFIED" if ok else "REJECTED",
@@ -103,8 +106,12 @@ def run_graph(
     verifications: list[dict] = []
     if spec.get("verify", True):
         fast_model = tier_models().get("normal", "")
+        by_id = {str(r.get("id")): r for r in results}
         with ThreadPoolExecutor(max_workers=max(1, min(4, len(results)))) as pool:
-            futures = {pool.submit(_verify, t, r, client, fast_model): r for t, r in zip(tasks, results)}
+            futures = {
+                pool.submit(_verify, t, by_id.get(str(t.get("id")), {}), client, fast_model): t
+                for t in tasks
+            }
             for fut in as_completed(futures):
                 verifications.append(fut.result())
         verifications.sort(key=lambda v: str(v.get("id")))

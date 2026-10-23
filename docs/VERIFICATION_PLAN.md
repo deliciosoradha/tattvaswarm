@@ -21,7 +21,7 @@ glab api "projects?search=dharmagate&simple=true&per_page=20" | python3 -c "impo
 
 ## A. Código — hallazgos de la revisión
 
-### A1. Bug de emparejamiento en el conductor (CRÍTICO)
+### A1. Bug de emparejamiento en el conductor (CRÍTICO) — ✅ FIXED
 - **Dónde:** `src/tattva_swarm/conductor.py:107` (`zip(tasks, results)`).
 - **Problema:** empareja por índice entre tareas (orden original) y resultados
   (ordenados por id). Falsos `REJECTED` cuando los ids no siguen el orden del spec.
@@ -58,19 +58,19 @@ glab api "projects?search=dharmagate&simple=true&per_page=20" | python3 -c "impo
   y quitarlo de las features anunciadas.
 - **Aceptación:** o bien usado por `conductor`/MCP, o bien README no lo lista como feature.
 
-### A6. Inconsistencia documental research tier
+### A6. Inconsistencia documental research tier — ✅ FIXED
 - **Dónde:** `docs/HACKATHON.md` ("Not run / not claimed") vs `docs/EVIDENCE.md §7`
   y `docs/SUBMISSION.md` ("5 results, 0.33 s").
 - **Fix:** reconciliar: EVIDENCE tiene la evidencia; HACKATHON debe decir
   "verificado en EVIDENCE §7, requiere TAVILY_API_KEY".
 - **Aceptación:** grep no muestra contradicción.
 
-### A7. `run_graph` no cumple "never raises"
+### A7. `run_graph` no cumple "never raises" — ✅ FIXED
 - **Dónde:** `conductor.py:55` `_run_task` (`task["prompt"]`).
 - **Fix:** usar `task.get("prompt", "")` y devolver error estructurado.
 - **Aceptación:** test con spec sin `prompt` → `status=error`, sin excepción.
 
-### A8. Verificador acepta "VERIFIED…"
+### A8. Verificador acepta "VERIFIED…" — ✅ FIXED
 - **Dónde:** `conductor.py:72` (`verdict_text.upper().startswith("VERIFIED")`).
 - **Fix:** parsear token exacto (`verdict_text.strip().upper() == "VERIFIED"` o regex).
 - **Aceptación:** "VERIFIED but wrong" → `REJECTED`.
