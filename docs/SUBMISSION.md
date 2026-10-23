@@ -111,6 +111,7 @@ Tavily Search API · SQLite FTS5 · Docker (demo) · Apache-2.0.
 
 ## Links
 - Repository: `https://github.com/deliciosoradha/tattvaswarm` (public, Apache-2.0)
+- Meru-Piṅgala paper (Zenodo): https://doi.org/10.5281/zenodo.23037502 — https://github.com/radhikachain/meru-pingala
 - Live demo (GitHub Pages): `https://deliciosoradha.github.io/tattvaswarm/` — deterministic router
   in the browser + live NVIDIA NIM calls through a Cloudflare Worker proxy (API key stays
   server-side). No install required.

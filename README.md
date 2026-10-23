@@ -116,6 +116,20 @@ merger ([`training/merge_lora_light.py`](training/merge_lora_light.py), numpy on
 official recipe ([`training/merge_lora_torch.py`](training/merge_lora_torch.py)). Job IDs,
 statuses and merge evidence: [`docs/POST_TRAINING.md`](docs/POST_TRAINING.md).
 
+## Related work — Meru-Piṅgala paper
+
+TattvaSwarm builds on the Meru-Piṅgala orchestration paper (deterministic scheduling,
+graph-fluid WIP control, evidence gates, Walsh-Hadamard telemetry):
+
+- Paper: *Meru-Pingala-Inspired Deterministic Orchestration of Evidence-Gated LLM Workflows*
+- Zenodo DOI: https://doi.org/10.5281/zenodo.23037502
+- Repo: https://github.com/radhikachain/meru-pingala
+- arXiv-ready source: `paper/Meru_Pingala_LLM_Orchestration_v2.tex` (category cs.MA)
+- Verified solutions & independent checks: `docs/VERIFIED_SOLUTIONS.md`
+
+The paper explicitly does **not** claim to solve the physical Navier-Stokes PDE; the
+Taylor-Green vortex benchmark in this repo is a separate, verified numerical check.
+
 ## Docs
 
 | Doc | What's in it |
