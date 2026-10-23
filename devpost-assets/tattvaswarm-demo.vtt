@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:09.000
+TattvaSwarm: sovereign personal AI swarm. Nebius x NVIDIA Global AI Hackathon 2026.
+
+2
+00:00:09.000 --> 00:00:21.000
+Honest degradation: with no key, TattvaSwarm reports the exact reason and never fabricates an answer.
+
+3
+00:00:21.000 --> 00:00:34.000
+With a key, the doctor verifies the backend live: 28 models, 5 NVIDIA/Nemotron.
+
+4
+00:00:34.000 --> 00:00:47.000
+Everyday prompts route to the fast Nemotron tier (Nano on Token Factory).
+
+5
+00:00:47.000 --> 00:01:00.000
+Reasoning prompts route to Nemotron Super.
+
+6
+00:01:00.000 --> 00:01:12.000
+Persistent local memory: SQLite + FTS5, on your disk only. Nothing syncs anywhere.
+
+7
+00:01:12.000 --> 00:01:26.000
+Logical swarm engine: 100,000 workers as compact state machines, verifiable checksum.
+
+8
+00:01:26.000 --> 00:01:40.000
+Conductor: parallel workers -> verifier pass -> heavy-model synthesis, ~2.3k tokens.
+
+9
+00:01:40.000 --> 00:01:52.000
+Live demo on GitHub Pages: deterministic router in the browser + live NVIDIA NIM calls.
+
+10
+00:01:52.000 --> 00:02:04.000
+Sovereignty is a routing problem before it is a cryptography problem.
