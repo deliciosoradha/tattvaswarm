@@ -122,6 +122,14 @@ Tavily Search API · SQLite FTS5 · Docker (demo) · Apache-2.0.
   (`DHARMAGATE:krittika`, YouTube `Jm4v_h4DW7o`) and MUST be replaced with the TattvaSwarm
   recording before judging.
 
+## Notebook (capacity benchmark)
+
+- Included in the repo: `notebooks/tattva_swarm_capacity_benchmark.ipynb`.
+- Re-run on this host (CPU only, no GPU): 2000/2000 tasks, 0 errors, 17.2 tasks/s
+  (4 workers, SHA-256-bound); CPU matmul 8.54 GFLOP/s (criterion > 10, not met on
+  this 4-core host). GPU cell requires a Colab T4 (see notebook §9, gated).
+- Meru-Piṅgala + Navier-Stokes verification: `docs/VERIFIED_SOLUTIONS.md`.
+
 ## Nebius feedback (honest & specific — $100 bonus section)
 
 - **What worked**: the OpenAI-compatible surface made integration a
