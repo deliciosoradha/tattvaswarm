@@ -28,6 +28,11 @@ honestly that the backend is unavailable (`small` tier keeps working fully
 locally, and every remote tier returns a structured error rather than
 pretending).
 
+> Note: this allowlist is a **documented policy table**, not a runtime
+> firewall. The code sends prompts to the hosts above when those tiers are
+> selected; there is no network-level blocklist. Removing the key is the
+> kill switch (see guarantee 3).
+
 ## Your guarantees as the operator
 
 1. **Read the ledger.** `$TATTVA_HOME/usage.jsonl` records every outbound call:

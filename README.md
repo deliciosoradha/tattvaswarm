@@ -20,7 +20,8 @@ https://deliciosoradha.github.io/tattvaswarm/ — deterministic router in the br
 
 ## What it does
 
-- **Tiered routing** — `small` is answered locally and never touches the network; `normal` →
+- **Tiered routing** — `small` is classified locally and never touches the network (currently a
+  no-op classifier: no business logic, just the label); `normal` →
   a fast Nemotron (Nano on Token Factory; Lightning on NVIDIA NIM), `reasoning` → Nemotron
   Super, `heavy` → Super/Ultra depending on the backend; `research` is optional Tavily search.
   A missing or misconfigured backend returns a structured error with the **exact reason** —
@@ -42,8 +43,8 @@ https://deliciosoradha.github.io/tattvaswarm/ — deterministic router in the br
 - **Agent surfaces** — the same capabilities as an **MCP server** (stdio, 6 tools) and a
   **LangChain** adapter (`ChatTattvaSwarm` + tools), so any agent framework can drive the swarm
   ([`docs/MCP.md`](docs/MCP.md), [`docs/LANGCHAIN.md`](docs/LANGCHAIN.md)).
-- **Sovereignty by policy** — an explicit allowlist of what may leave the machine, a local usage
-  ledger for every outbound call, and a pre-push sanitization scanner
+- **Sovereignty by policy** — a documented allowlist of what may leave the machine (policy, not
+  code enforcement), a local usage ledger for every outbound call, and a pre-push sanitization scanner
   ([`docs/SOVEREIGNTY.md`](docs/SOVEREIGNTY.md)).
 
 ## Quickstart (tested)
@@ -99,7 +100,7 @@ python3 demos/demo_mass_swarm.py      # logical swarm engine: 100k → 1M worker
 
 ### Demo video
 
-The hackathon build is a CLI; there is **no hosted interactive demo** (no cloud spend).
+The hackathon build is a CLI, but a hosted interactive demo now exists (GitHub Pages, link above).
 The submitted **2:03** screen recording has burned English captions; the complete SRT/VTT
 are supplied with the Devpost entry. Run the same commands locally with the quickstart
 above. A CPU serverless endpoint script and an HF Space fallback are included for
