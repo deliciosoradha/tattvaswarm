@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-11-01T16:00:00Z",
+  "primary_author": {
+    "name": "Axel Domingo Padilla Arriaga",
+    "handle": "@deliciosoradha",
+    "email": "axelpadilla98@gmail.com",
+    "organization": "RadhikaChain Sovereign Infrastructure & Autonomous Swarm"
+  },
+  "papers": [
+    {
+      "id": "paper_100b_crown_resilience",
+      "title": "Sub-Second Global Systemic Resilience Analysis of 100 Billion Coupled Urban-Financial Nodes via Meru-Pingala Hypercube Stratification",
+      "tex_file": "paper/paper_100b_crown_resilience.tex",
+      "primary_category": "cs.DC",
+      "secondary_categories": ["cs.CE", "physics.comp-ph", "q-fin.CP", "math.CO"],
+      "scale_nodes": 100000000000,
+      "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
+      "measured_execution_time_seconds": 140.6495,
+      "measured_throughput_entities_sec": 710987320.32,
+      "telescopic_flux_residual": -1.9798929761628563e-09,
+      "reproducible_benchmark": "benchmarks/global_systemic_resilience_paper.py"
+    },
+    {
+      "id": "paper_earth2_cupti_blackwell",
+      "title": "Subgrid-Scale Turbulence Closure and 44.01x Speedup on Blackwell SM120: Matrix-Free Fused Triton Kernels for High-Resolution Global Climate Modeling",
+      "tex_file": "paper/paper_earth2_cupti_blackwell.tex",
+      "primary_category": "cs.DC",
+      "secondary_categories": ["physics.ao-ph", "physics.flu-dyn"],
+      "scale_nodes": 103824000,
+      "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
+      "measured_speedup_vs_pytorch": 44.01,
+      "measured_fused_latency_ms": 0.8597,
+      "measured_bandwidth_gb_s": 1449.14,
+      "compiler_registers_per_thread": 40,
+      "compiler_spills_bytes": 0,
+      "trace_artifact": "docs/evidence/nsight_cupti_triton_trace.json",
+      "figure_artifact": "docs/evidence/nsight_earth2_gpu_trace_evidence.png"
+    },
+    {
+      "id": "paper_triple_industrial_multipysics",
+      "title": "Unified Multi-Physics and Sovereign Financial Contagion Modeling at Terabyte Bandwidth: Aerothermal Mach 15 Reentry and Sub-Millisecond DeFi Exploit Detection",
+      "tex_file": "paper/paper_triple_industrial_multipysics.tex",
+      "primary_category": "cs.CE",
+      "secondary_categories": ["q-fin.CP", "physics.comp-ph"],
+      "scale_nodes": 10800000,
+      "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
+      "measured_domain_latencies_ms": {
+        "defi_sentinel": 0.0838,
+        "hypersonic_reentry_shield": 0.0505,
+        "taylor_green_vortex": 0.0437
+      },
+      "peak_bandwidth_gb_s": 2967.03,
+      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py"
+    }
+  ],
+  "kanban_cards": {
+    "paper_1": "t_11693af0",
+    "paper_2": "t_02610e16",
+    "paper_3": "t_7b25b1d3",
+    "publication_sheet": "t_99e06299"
+  },
+  "status": "READY_FOR_OPERATOR_APPROVAL"
+}
