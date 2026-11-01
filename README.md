@@ -176,12 +176,13 @@ All benchmarks below were executed directly on an **NVIDIA RTX PRO 6000 Blackwel
 
 Compiler SASS/PTX analysis on Blackwell (`sm_120`): **40 registers/thread**, 0 local spills, 100% memory coalescing.
 
-## Scientific Papers & Preprints (Blackwell SM120 Suite)
+## Scientific Papers & Preprints (Blackwell SM120 & Meru-Piṅgala Suite)
 
-Each milestone verified on the NVIDIA RTX PRO 6000 Blackwell GPU is authored as an independent, monolithic IEEE/ACM-style publication with standalone source code, PDF, and distribution packages:
+Each milestone verified across the NVIDIA RTX PRO 6000 Blackwell GPU and the combinatorial swarm architecture is authored as an independent, monolithic IEEE/ACM-style publication with standalone source code, PDF, and distribution packages:
 
 | Paper / Research Focus | PDF Document | arXiv Source Bundle | Zenodo DOI & Package | Category |
 |---|---|---|---|---|
+| **0. Foundational: Meru-Piṅgala Deterministic Orchestration** (19 pp) | [`paper/meru_pingala_deterministic_orchestration.pdf`](paper/meru_pingala_deterministic_orchestration.pdf) | Available in Release | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23054158.svg)](https://doi.org/10.5281/zenodo.23054158)<br>([`zenodo.org/records/23054158`](https://zenodo.org/records/23054158)) | `cs.DC` / `math.CO` |
 | **1. 100 Billion Nodes Resilience Engine** | [`paper/paper_100b_crown_resilience.pdf`](paper/paper_100b_crown_resilience.pdf) | [`arxiv_paper_100b_crown_resilience.tar.gz`](docs/submissions/arxiv_paper_100b_crown_resilience.tar.gz) | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23871039.svg)](https://doi.org/10.5281/zenodo.23871039)<br>([`zenodo_paper_100b_crown_resilience.zip`](docs/submissions/zenodo_paper_100b_crown_resilience.zip)) | `cs.DC` / `cs.CE` |
 | **2. Earth-2 Subgrid Turbulence Closure** | [`paper/paper_earth2_cupti_blackwell.pdf`](paper/paper_earth2_cupti_blackwell.pdf) | [`arxiv_paper_earth2_cupti_blackwell.tar.gz`](docs/submissions/arxiv_paper_earth2_cupti_blackwell.tar.gz) | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23871045.svg)](https://doi.org/10.5281/zenodo.23871045)<br>([`zenodo_paper_earth2_cupti_blackwell.zip`](docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip)) | `cs.DC` / `physics.ao-ph` |
 | **3. DeFi Mainnet Risk Sentinel** | [`paper/paper_defi_mainnet_sentinel.pdf`](paper/paper_defi_mainnet_sentinel.pdf) | [`arxiv_paper_defi_mainnet_sentinel.tar.gz`](docs/submissions/arxiv_paper_defi_mainnet_sentinel.tar.gz) | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23871051.svg)](https://doi.org/10.5281/zenodo.23871051)<br>([`zenodo_paper_defi_mainnet_sentinel.zip`](docs/submissions/zenodo_paper_defi_mainnet_sentinel.zip)) | `q-fin.CP` / `cs.DC` |

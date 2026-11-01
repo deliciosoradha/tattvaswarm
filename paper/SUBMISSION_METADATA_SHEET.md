@@ -8,6 +8,18 @@
 
 ---
 
+## 0. Foundational Paper: Meru-Piṅgala-Inspired Deterministic Orchestration
+
+- **Zenodo DOI Oficial:** [10.5281/zenodo.23054158](https://zenodo.org/records/23054158)
+- **Documento PDF Oficial (19 páginas):** [`paper/meru_pingala_deterministic_orchestration.pdf`](paper/meru_pingala_deterministic_orchestration.pdf)
+- **Título en inglés:** *Meru-Pingala-Inspired Deterministic Orchestration: Combinatorial Scheduling, Graph-Fluid Conservation, and Evidence-Gated Promotion*
+- **Categorías arXiv sugeridas:** `cs.DC` (Distributed, Parallel, and Cluster Computing), `math.CO` (Combinatorics), `cs.SE` (Software Engineering).
+- **Resumen:**
+  > We present a deterministic orchestration framework inspired by the classical combinatorial structures of Meru-Prastāra and Piṅgala's Chandaḥśāstra. The system unifies three complementary mechanisms: (1) Combinatorial Scheduling via recursive Meru-Prastāra enumeration and prastāra-style systematic exploration of execution paths, enabling exhaustive yet efficient generation of feasible schedules without reliance on stochastic search; (2) Graph-Fluid Conservation: a continuous conservation-law formulation over the directed acyclic graph (DAG) of computational or transactional state (e.g., UTXO-style dependency graphs) where resource flows, contention, and capacity are treated as conserved quantities, yielding predictable, race-free parallel execution; and (3) Evidence-Gated Promotion: an activation policy that advances tasks, agents, or routes only when verifiable evidence thresholds are met.
+- **Artefactos del release:** Paquete reproducible v1.1.0 (`meru_pingala_v1.1.0_scientific_release.tar.gz`) con 10 figuras de benchmarking y suite completa en Rust/Python.
+
+---
+
 ## 1. Paper 1 (Crown Jewel): 100 Billion Nodes Systemic Resilience
 
 - **Zenodo DOI Oficial:** [10.5281/zenodo.23871039](https://zenodo.org/records/23871039)
