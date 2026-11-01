@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-01T16:00:00Z",
+  "timestamp": "2026-11-01T16:10:00Z",
   "primary_author": {
     "name": "Axel Domingo Padilla Arriaga",
     "handle": "@deliciosoradha",
@@ -37,27 +37,44 @@
       "figure_artifact": "docs/evidence/nsight_earth2_gpu_trace_evidence.png"
     },
     {
-      "id": "paper_triple_industrial_multipysics",
-      "title": "Unified Multi-Physics and Sovereign Financial Contagion Modeling at Terabyte Bandwidth: Aerothermal Mach 15 Reentry and Sub-Millisecond DeFi Exploit Detection",
-      "tex_file": "paper/paper_triple_industrial_multipysics.tex",
-      "primary_category": "cs.CE",
-      "secondary_categories": ["q-fin.CP", "physics.comp-ph"],
+      "id": "paper_defi_mainnet_sentinel",
+      "title": "Sub-Millisecond Mainnet Financial Contagion Sentinel: Detecting High-Frequency Liquidity Cascades at 1,546 GB/s via Fused Hypercube Tensor Kernels",
+      "tex_file": "paper/paper_defi_mainnet_sentinel.tex",
+      "primary_category": "q-fin.CP",
+      "secondary_categories": ["cs.DC", "cs.CR"],
       "scale_nodes": 10800000,
       "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
-      "measured_domain_latencies_ms": {
-        "defi_sentinel": 0.0838,
-        "hypersonic_reentry_shield": 0.0505,
-        "taylor_green_vortex": 0.0437
-      },
-      "peak_bandwidth_gb_s": 2967.03,
+      "measured_latency_ms": 0.0838,
+      "measured_bandwidth_gb_s": 1546.39,
+      "peak_solvency_risk_detected": 1.0,
+      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py"
+    },
+    {
+      "id": "paper_aerospace_hypersonic_shield",
+      "title": "Aerothermal Hypersonic Reentry Simulation at Mach 15: Non-Linear PICA-X Thermal Shield Diffusion at 2,564 GB/s on NVIDIA Blackwell",
+      "tex_file": "paper/paper_aerospace_hypersonic_shield.tex",
+      "primary_category": "physics.flu-dyn",
+      "secondary_categories": ["physics.comp-ph", "cs.CE"],
+      "scale_nodes": 10800000,
+      "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
+      "measured_latency_ms": 0.0505,
+      "measured_bandwidth_gb_s": 2564.91,
+      "aerothermal_regime": "Mach 15 Reentry Shock Layer",
+      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py"
+    },
+    {
+      "id": "paper_taylor_green_vortex",
+      "title": "High-Fidelity Taylor-Green Vortex Hydrodynamic State Assimilation and Regularized Adjoint Inversion at 2,967 GB/s on NVIDIA Blackwell",
+      "tex_file": "paper/paper_taylor_green_vortex.tex",
+      "primary_category": "physics.flu-dyn",
+      "secondary_categories": ["physics.comp-ph", "cs.DC"],
+      "scale_nodes": 10800000,
+      "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
+      "measured_latency_ms": 0.0437,
+      "measured_bandwidth_gb_s": 2967.03,
+      "mass_divergence_residual": 0.0,
       "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py"
     }
   ],
-  "kanban_cards": {
-    "paper_1": "t_11693af0",
-    "paper_2": "t_02610e16",
-    "paper_3": "t_7b25b1d3",
-    "publication_sheet": "t_99e06299"
-  },
   "status": "READY_FOR_OPERATOR_APPROVAL"
 }
