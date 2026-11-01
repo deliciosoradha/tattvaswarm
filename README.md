@@ -130,6 +130,27 @@ graph-fluid WIP control, evidence gates, Walsh-Hadamard telemetry):
 The paper explicitly does **not** claim to solve the physical Navier-Stokes PDE; the
 Taylor-Green vortex benchmark in this repo is a separate, verified numerical check.
 
+## Taylor-Green 2-D benchmark (Rust)
+
+[`benchmarks/tattva-taylor-green/`](benchmarks/tattva-taylor-green/) is a self-contained,
+reproducible CPU benchmark for the native solver. It replaces the earlier 1-D `solve` chain
+(max vorticity ~`5.8e-4 s^-1`) with a 2-D incompressible Navier-Stokes solve in
+vorticity-streamfunction form on a periodic `[0, 2π)²` domain.
+
+Measured on a 4-core host, grid `300 × 360` (108,000 cells), 40 steps, `Re = 100`:
+max vorticity `2.128 s^-1`, enstrophy `20.43`, kinetic energy `9.92`, mass residual `0`,
+divergence residual `3.3e-6`, CFL `0.111`. The validation script reports 10/10 checks PASS;
+the optional NVIDIA NIM audit returned `VERDICT=PASS` (the solver itself runs on CPU).
+
+```bash
+cd benchmarks/tattva-taylor-green
+./native/target/release/shiva tattva-benchmark 108000 --steps 40 --re 100 --json
+python3 scripts/validate_tattva_benchmark.py --n 108000 --steps 40 --re 100 --out-dir evidence
+```
+
+The bundle includes the Apache-2.0 license, source, prebuilt Linux x86-64 binary, run log,
+environment snapshot and a SHA-256 manifest (`sha256sum -c evidence/MANIFEST.sha256`).
+
 ## Docs
 
 | Doc | What's in it |

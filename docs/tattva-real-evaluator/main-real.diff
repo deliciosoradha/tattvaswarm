@@ -1,0 +1,131 @@
+--- main.rs.bak-20261023	2026-10-23 15:13:14.669459601 -0600
++++ main.rs	2026-10-23 15:24:55.643420781 -0600
+@@ -211,21 +211,125 @@
+     0
+ }
+ 
++/// Ejecuta un comando con timeout (ms) y devuelve su stdout si terminó a tiempo.
++fn run_with_timeout(program: &str, args: &[String], timeout_ms: u64) -> Option<String> {
++    use std::sync::mpsc;
++    let (tx, rx) = mpsc::sync_channel::<std::io::Result<std::process::Output>>(1);
++    let program = program.to_string();
++    let args: Vec<String> = args.to_vec();
++    std::thread::spawn(move || {
++        let out = std::process::Command::new(&program)
++            .args(&args)
++            .stdout(std::process::Stdio::piped())
++            .stderr(std::process::Stdio::null())
++            .output();
++        let _ = tx.send(out);
++    });
++    match rx.recv_timeout(std::time::Duration::from_millis(timeout_ms)) {
++        Ok(Ok(output)) if output.status.success() => {
++            Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
++        }
++        _ => None,
++    }
++}
++
++/// Recoge las señales vivas del sistema: sensor eBPF dharma-xdp (:8151/metrics)
++/// y evidencia condensada reciente vía `rtk smart` sobre el último reporte.
++fn detect_signals() -> atman::SignalContext {
++    let mut sig = atman::SignalContext::default();
++
++    // Señal 1: sensor dharma-xdp (telemetría eBPF viva).
++    let agent = ureq::AgentBuilder::new()
++        .timeout(std::time::Duration::from_millis(1500))
++        .build();
++    if let Ok(resp) = agent.get("http://127.0.0.1:8151/metrics").call() {
++        if let Ok(body) = resp.into_string() {
++            sig.sensor_alive = true;
++            sig.sensor_metrics = body.lines().filter(|l| !l.starts_with('#') && !l.trim().is_empty()).count() as u64;
++            for line in body.lines() {
++                if let Some(rest) = line.strip_prefix("radhika_amenazas_eventos_total ") {
++                    sig.sensor_events = rest.trim().parse().unwrap_or(0);
++                }
++            }
++        }
++    }
++
++    // Señal 2: evidencia condensada — `rtk smart` sobre el .md más reciente de lab-master.
++    let reports_dir = std::path::PathBuf::from(
++        std::env::var("HOME").unwrap_or_else(|_| "/home/delideli".to_string()),
++    )
++    .join("lab-master/reports");
++    let mut newest: Option<(std::time::SystemTime, std::path::PathBuf)> = None;
++    if let Ok(rd) = std::fs::read_dir(&reports_dir) {
++        for entry in rd.flatten() {
++            let p = entry.path();
++            if !p.is_dir() {
++                continue;
++            }
++            if let Ok(sub) = std::fs::read_dir(&p) {
++                for f in sub.flatten() {
++                    let fp = f.path();
++                    if fp.extension().and_then(|e| e.to_str()) == Some("md") {
++                        if let Ok(mtime) = fp.metadata().and_then(|m| m.modified()) {
++                            if newest.as_ref().map(|(t, _)| mtime > *t).unwrap_or(true) {
++                                newest = Some((mtime, fp));
++                            }
++                        }
++                    }
++                }
++            }
++        }
++    }
++    if let Some((_, path)) = newest {
++        let path_str = path.to_string_lossy().into_owned();
++        let args = vec!["smart".to_string(), path_str];
++        if let Some(summary) = run_with_timeout("rtk", &args, 4000) {
++            let first_lines: Vec<&str> = summary.lines().take(2).collect();
++            if !first_lines.is_empty() {
++                sig.evidence_summary = Some(first_lines.join(" | "));
++            }
++        }
++    }
++
++    sig
++}
++
+ fn tattva_cmd_evaluate(text: &str) -> i32 {
+-    println!("[*] Initializing Atman 8 Soul Aspects Decision Evaluator...");
++    println!("[*] Initializing Atman 8 Soul Aspects Decision Evaluator (real signals mode)...");
+     let evaluator = atman::AtmanEvaluator::new();
+ 
++    println!("[*] Gathering live signals: dharma-xdp sensor + rtk evidence...");
++    let signals = detect_signals();
++    let sensor_str = if signals.sensor_alive {
++        format!("ALIVE ({} métricas, {} eventos XDP)", signals.sensor_metrics, signals.sensor_events)
++    } else {
++        "DOWN".to_string()
++    };
++    let ev_str = signals.evidence_summary.clone().unwrap_or_else(|| "ninguna".into());
++    println!(
++        "[*] Signals: dharma-sensor-xdp: {} | rtk-evidence: {}",
++        sensor_str, ev_str
++    );
++
+     println!("[*] Evaluating Decision Text:\n\"{}\"\n", text);
+-    let assessment = evaluator.evaluate_decision(108, text);
++    let assessment = evaluator.evaluate_decision_with_signals(108, text, &signals);
+ 
+     println!("=== ATMAN EVALUATION REPORT ===");
+     println!("Agent ID:           {}", assessment.agent_id);
+     println!("Overall Alignment:  {:.3}", assessment.overall_alignment);
+-    println!("Status:             {}", if assessment.is_aligned { "ALIGNED (Spiritual Pole)" } else { "MISALIGNED (Material Entanglement)" });
++    let status = if assessment.is_aligned {
++        "ALIGNED (Spiritual Pole)"
++    } else if assessment.overall_alignment >= 0.0 {
++        "TRANSITIONAL (Neutral)"
++    } else {
++        "MISALIGNED (Material Entanglement)"
++    };
++    println!("Status:             {}", status);
+     println!("Reward Multiplier:  {:.1}x", assessment.reward_multiplier);
+     println!("\nDetailed Aspect Breakdown:");
+     for ev in &assessment.aspect_evaluations {
+         println!("  [{}] {}: net={:+.2} => {}", ev.aspect_id, ev.aspect_name, ev.net_alignment, ev.classification);
++        println!("        {}", ev.justification);
+     }
+     println!("============================================================\n");
+     0
