@@ -49,7 +49,7 @@
 +
 +    // Señal 2: evidencia condensada — `rtk smart` sobre el .md más reciente de lab-master.
 +    let reports_dir = std::path::PathBuf::from(
-+        std::env::var("HOME").unwrap_or_else(|_| "/home/delideli".to_string()),
++        std::env::var("HOME").unwrap_or_else(|_| "/home/user".to_string()),
 +    )
 +    .join("lab-master/reports");
 +    let mut newest: Option<(std::time::SystemTime, std::path::PathBuf)> = None;

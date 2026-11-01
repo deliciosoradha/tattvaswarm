@@ -33,6 +33,14 @@ https://deliciosoradha.github.io/tattvaswarm/ — deterministic router in the br
 - **Rust core, bit-identical** — the same engine as a std-only Rust binary: identical checksums,
   ~140–170× faster (100k workers in 0.030 s, 1M in 0.232 s — measured,
   [`docs/EVIDENCE.md`](docs/EVIDENCE.md) §5).
+- **Sub-millisecond AI Safety & Agent Guardrails (Atman v2.1 in Rust)** — two-phase negative masking
+  policy enforcer that suppresses unsafe execution paths before green flags are evaluated, grounding
+  agent decisions deterministically at <0.01 ms ([`agent-guardrails/`](agent-guardrails/)).
+- **Native CUDA C++ & Triton Hypercube Kernels** — custom warp-level reductions, bank-conflict-free
+  2D transpose, and register-fused $Q_{36}$ hypercube operators ([`gpu-kernels/`](gpu-kernels/)).
+- **Massive Scale GPU Benchmarks (NVIDIA RTX PRO 6000 Blackwell)** — 100 Billion coupled nodes
+  evaluated in 140s; 12.1 Billion contiguous nodes (90.15 GB VRAM) at 1,461.48 GB/s; and Earth-2
+  closure kernel achieving **44.01× speedup** over PyTorch eager ([`docs/evidence/`](docs/evidence/)).
 - **Code engine with a hardened sandbox** — agent-authored commands run in a container with no
   network by default, memory/CPU/pids caps and a wall-clock watchdog; code never executes on the
   host ([`docs/SANDBOX.md`](docs/SANDBOX.md)).
@@ -151,10 +159,46 @@ python3 scripts/validate_tattva_benchmark.py --n 108000 --steps 40 --re 100 --ou
 The bundle includes the Apache-2.0 license, source, prebuilt Linux x86-64 binary, run log,
 environment snapshot and a SHA-256 manifest (`sha256sum -c evidence/MANIFEST.sha256`).
 
+## Scale & Hardware Benchmarks (NVIDIA RTX PRO 6000 Blackwell)
+
+All benchmarks below were executed directly on an **NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, 188 SMs, `sm_120`, PyTorch 2.11.0+cu130)**.
+
+![Nsight Hardware Trace & Earth-2 Closure Benchmark](docs/evidence/nsight_earth2_gpu_trace_evidence.png)
+
+### Benchmark Summary & Measured Throughput
+
+| Benchmark Suite | Problem Scale ($N$) | Memory / Footprint | Measured Latency | Measured Throughput / Speedup | Hardware Evidence |
+|---|---|---|---|---|---|
+| **Earth-2 Subgrid Closure** | 103,824,000 points (ERA5 global) | 1.16 GB VRAM | **0.8597 ms** (PyTorch: 37.84 ms) | **44.01× Speedup** (1,449.14 GB/s) | [`nsight_cupti_triton_trace.json`](docs/evidence/nsight_cupti_triton_trace.json) |
+| **GPU Auto-Discovery Roofline** | 12,099,058,321 nodes | **90.15 GB VRAM** (94.9% sat) | **66.2 ms** / step | **1,461.48 GB/s** sustained | Zero OOM, 64-bit safe offsets |
+| **Global Resilience Engine 100B** | **100,000,000,000 entities** ($Q_{36}$) | Matrix-free streaming | **140.0 s** total | **714.26M entities/sec** | Telescopic residual: `-1.98e-9` |
+| **Triple Industrial Suite** | 10,800,000 nodes | Multi-physics / Fin | 0.0437 – 0.0838 ms | **1,546 – 2,967 GB/s** | Taylor-Green, Aero, DeFi Risk |
+
+Compiler SASS/PTX analysis on Blackwell (`sm_120`): **40 registers/thread**, 0 local spills, 100% memory coalescing.
+
+## Native CUDA C++ Kernels (`/gpu-kernels/`)
+
+Production-grade CUDA C++ kernels located in [`gpu-kernels/cuda/`](gpu-kernels/cuda/):
+- **Warp-Level Parallel Reductions (`nim_C03.cu`)**: `__shfl_down_sync` tree reductions avoiding atomic contention.
+- **Bank-Conflict-Free 2D Transpose (`nim_C04.cu`)**: Shared memory padding (`TILE_DIM × (TILE_DIM + 1)`) eliminating 32-way shared bank serialization.
+- **Triton Matrix-Free Hypercube Operators**: Bipartite graph streaming without allocating quadratic adjacency matrices.
+- Full documentation and compilation instructions: [`gpu-kernels/README.md`](gpu-kernels/README.md).
+
+## Sub-Millisecond AI Safety & Agent Guardrails (`/agent-guardrails/`)
+
+**Atman v2.1** provides a deterministic runtime policy enforcer written in Rust for autonomous agents operating across code sandboxes and DeFi protocols:
+- **Two-Phase Negative Masking**: Red flags (unauthorized mainnet private key extraction, unverified external RPCs, destructive system calls) suppress execution permissions *before* green flags (valid test suite, dry-run flag) can be evaluated.
+- **Sub-Millisecond Overhead**: Evaluated in `<0.01 ms` (nanosecond scale) per agent intent.
+- **Empirical Validation**: 8/8 test matrix pass rate across benign, borderline, and attack vectors.
+- Architecture details and policy specification: [`agent-guardrails/README.md`](agent-guardrails/README.md).
+
 ## Docs
 
 | Doc | What's in it |
 |---|---|
+| [`agent-guardrails/README.md`](agent-guardrails/README.md) | Atman v2.1 Rust deterministic AI safety enforcer |
+| [`gpu-kernels/README.md`](gpu-kernels/README.md) | Native CUDA C++ kernels, warp reductions, transpose |
+| [`docs/evidence/nsight_cupti_triton_trace.json`](docs/evidence/nsight_cupti_triton_trace.json) | Hardware trace & compiler metrics on Blackwell RTX PRO 6000 |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | components, data flow, concurrency model |
 | [`docs/TOKEN_FACTORY.md`](docs/TOKEN_FACTORY.md) | verified model catalog, tier map, measured latencies |
 | [`docs/SANDBOX.md`](docs/SANDBOX.md) | code engine: hardened sandbox, verified runs, cloud-swap path |
