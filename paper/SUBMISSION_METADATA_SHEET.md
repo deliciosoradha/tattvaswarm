@@ -94,11 +94,11 @@
 
 | Paper | Archivo LaTeX | Tarjeta Kanban | Estado |
 |---|---|---|---|
-| Paper 1: 100B Resilience Engine | `paper/paper_100b_crown_resilience.tex` | `t_11693af0` | Listo para aprobación |
-| Paper 2: Earth-2 Subgrid Closure | `paper/paper_earth2_cupti_blackwell.tex` | `t_02610e16` | Listo para aprobación |
-| Paper 3: DeFi Mainnet Sentinel | `paper/paper_defi_mainnet_sentinel.tex` | `t_7b25b1d3` | Listo para aprobación |
-| Paper 4: Aerotérmico PICA-X Mach 15 | `paper/paper_aerospace_hypersonic_shield.tex` | `t_aero_shield` | Listo para aprobación |
-| Paper 5: Taylor-Green Vortex | `paper/paper_taylor_green_vortex.tex` | `t_vortex_tg` | Listo para aprobación |
-| Submission & Swarm Metadata | `paper/submission_metadata.json` | `t_99e06299` | Listo para aprobación |
+| Paper 1: 100B Resilience Engine | `paper/paper_100b_crown_resilience.tex` (`.pdf` 94 KB) | `t_11693af0` | Compilado y verificado |
+| Paper 2: Earth-2 Subgrid Closure | `paper/paper_earth2_cupti_blackwell.tex` (`.pdf` 320 KB) | `t_02610e16` | Compilado y verificado |
+| Paper 3: DeFi Mainnet Sentinel | `paper/paper_defi_mainnet_sentinel.tex` (`.pdf` 76 KB) | `t_7b25b1d3` | Compilado y verificado |
+| Paper 4: Aerotérmico PICA-X Mach 15 | `paper/paper_aerospace_hypersonic_shield.tex` (`.pdf` 72 KB) | `t_5d14ca1a` | Compilado y verificado |
+| Paper 5: Taylor-Green Vortex | `paper/paper_taylor_green_vortex.tex` (`.pdf` 69 KB) | `t_113e6513` | Compilado y verificado |
+| Submission & Swarm Metadata | `paper/submission_metadata.json` | `t_99e06299` | Compilado y verificado |
 
 Una vez otorgada tu aprobación en el chat, el swarm compila los paquetes independientes de distribución y sincroniza los repositorios remotos.
