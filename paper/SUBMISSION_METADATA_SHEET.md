@@ -92,13 +92,34 @@
 
 ## 6. Resumen de Tarjetas Hermes Kanban y Acciones del Swarm
 
-| Paper | Archivo LaTeX | Tarjeta Kanban | Estado |
-|---|---|---|---|
-| Paper 1: 100B Resilience Engine | `paper/paper_100b_crown_resilience.tex` (`.pdf` 94 KB) | `t_11693af0` | Compilado y verificado |
-| Paper 2: Earth-2 Subgrid Closure | `paper/paper_earth2_cupti_blackwell.tex` (`.pdf` 320 KB) | `t_02610e16` | Compilado y verificado |
-| Paper 3: DeFi Mainnet Sentinel | `paper/paper_defi_mainnet_sentinel.tex` (`.pdf` 76 KB) | `t_7b25b1d3` | Compilado y verificado |
-| Paper 4: Aerotérmico PICA-X Mach 15 | `paper/paper_aerospace_hypersonic_shield.tex` (`.pdf` 72 KB) | `t_5d14ca1a` | Compilado y verificado |
-| Paper 5: Taylor-Green Vortex | `paper/paper_taylor_green_vortex.tex` (`.pdf` 69 KB) | `t_113e6513` | Compilado y verificado |
-| Submission & Swarm Metadata | `paper/submission_metadata.json` | `t_99e06299` | Compilado y verificado |
+| Paper | Archivo LaTeX | Tarjeta Kanban | Estado | Paquete arXiv (`.tar.gz`) | Paquete Zenodo (`.zip`) |
+|---|---|---|---|---|---|
+| Paper 1: 100B Resilience Engine | `paper/paper_100b_crown_resilience.tex` (`.pdf` 94 KB) | `t_11693af0` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_100b_crown_resilience.tar.gz` | `docs/submissions/zenodo_paper_100b_crown_resilience.zip` |
+| Paper 2: Earth-2 Subgrid Closure | `paper/paper_earth2_cupti_blackwell.tex` (`.pdf` 320 KB) | `t_02610e16` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_earth2_cupti_blackwell.tar.gz` | `docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip` |
+| Paper 3: DeFi Mainnet Sentinel | `paper/paper_defi_mainnet_sentinel.tex` (`.pdf` 76 KB) | `t_7b25b1d3` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_defi_mainnet_sentinel.tar.gz` | `docs/submissions/zenodo_paper_defi_mainnet_sentinel.zip` |
+| Paper 4: Aerotérmico PICA-X Mach 15 | `paper/paper_aerospace_hypersonic_shield.tex` (`.pdf` 72 KB) | `t_5d14ca1a` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_aerospace_hypersonic_shield.tar.gz` | `docs/submissions/zenodo_paper_aerospace_hypersonic_shield.zip` |
+| Paper 5: Taylor-Green Vortex | `paper/paper_taylor_green_vortex.tex` (`.pdf` 69 KB) | `t_113e6513` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_taylor_green_vortex.tar.gz` | `docs/submissions/zenodo_paper_taylor_green_vortex.zip` |
+| Submission & Swarm Metadata | `paper/submission_metadata.json` | `t_99e06299` | APROBADO & PUBLICADO | Manifest: `docs/submissions/package_manifest.json` | Checksums SHA-256 verificados |
 
-Una vez otorgada tu aprobación en el chat, el swarm compila los paquetes independientes de distribución y sincroniza los repositorios remotos.
+---
+
+## 7. Tabla de Integridad y Checksums Criptográficos (SHA-256)
+
+| Artefacto | Tamaño | SHA-256 Checksum |
+|---|---|---|
+| `paper/paper_100b_crown_resilience.pdf` | 94,052 B | `b55df0d23790b5dada0e5ba8cb40d11806f92a34a9e8c1750e68b01a6b828253` |
+| `docs/submissions/arxiv_paper_100b_crown_resilience.tar.gz` | 4,500 B | `945e47d9bd5f79d931ab0def5d7de39b3d7605b5e8810d47517a6806673b7b79` |
+| `docs/submissions/zenodo_paper_100b_crown_resilience.zip` | 97,473 B | `0624d656e94dbd0a2ed6b01f7e7c16bc74027ae14a3abd7bbf1e2a8df6dff495` |
+| `paper/paper_earth2_cupti_blackwell.pdf` | 320,706 B | `e0c88fb599732daacbd2b74836dbe855a199826a5f251f6d7e871305baa94a9a` |
+| `docs/submissions/arxiv_paper_earth2_cupti_blackwell.tar.gz` | 262,361 B | `dc5db9bc386f758eb816140b0b8e044a9b177965a38c9233811c7ccfb9d81489` |
+| `docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip` | 568,807 B | `5262dad61d40b44b5d9b1e158b588442fb732e5b7b320edb4fefeb6db6560e8d` |
+| `paper/paper_defi_mainnet_sentinel.pdf` | 75,599 B | `91c2d18144d4217d83f9f5340567e49544ad0d3e0e80bee714505f0dd379b9fb` |
+| `docs/submissions/arxiv_paper_defi_mainnet_sentinel.tar.gz` | 3,754 B | `2b1c5b0e66eee00334cf604e3db6c662c10a0cf69916fe01cf751916d5ad72c8` |
+| `docs/submissions/zenodo_paper_defi_mainnet_sentinel.zip` | 78,569 B | `26fa1ce5df5e55a0a4f44167825039c86acb6be1ee04c433a5dae0911dbf6389` |
+| `paper/paper_aerospace_hypersonic_shield.pdf` | 72,342 B | `8a1ded84bf35caac53041e97ac9b56a46c66826aff66735641173e12387d812b` |
+| `docs/submissions/arxiv_paper_aerospace_hypersonic_shield.tar.gz` | 3,361 B | `9c4487e7056476e4eb535e3bb37b88f7034f9e3ae38dee0f5b6bc3d02ec2cbdb` |
+| `docs/submissions/zenodo_paper_aerospace_hypersonic_shield.zip` | 75,821 B | `d1d7f1c0613879899b8baf8e38d6d50a33f1cd22389fbbcd5e343d810fc729ed` |
+| `paper/paper_taylor_green_vortex.pdf` | 69,353 B | `a31b4f71eb334d1274612043c028c4408f38128c0a327353adde66edfeb23f4b` |
+| `docs/submissions/arxiv_paper_taylor_green_vortex.tar.gz` | 3,230 B | `19f76d0348a15cacda8722b4eb4d4858ecae2fbe9f56a2a7d3c1f6fb934ea22d` |
+| `docs/submissions/zenodo_paper_taylor_green_vortex.zip` | 72,650 B | `b28545a2b423b27667ea885aed18fe8772887f9d64a2627ac077998114cb8c09` |
+

@@ -12,20 +12,45 @@
       "title": "Sub-Second Global Systemic Resilience Analysis of 100 Billion Coupled Urban-Financial Nodes via Meru-Pingala Hypercube Stratification",
       "tex_file": "paper/paper_100b_crown_resilience.tex",
       "primary_category": "cs.DC",
-      "secondary_categories": ["cs.CE", "physics.comp-ph", "q-fin.CP", "math.CO"],
+      "secondary_categories": [
+        "cs.CE",
+        "physics.comp-ph",
+        "q-fin.CP",
+        "math.CO"
+      ],
       "scale_nodes": 100000000000,
       "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
       "measured_execution_time_seconds": 140.6495,
       "measured_throughput_entities_sec": 710987320.32,
       "telescopic_flux_residual": -1.9798929761628563e-09,
-      "reproducible_benchmark": "benchmarks/global_systemic_resilience_paper.py"
+      "reproducible_benchmark": "benchmarks/global_systemic_resilience_paper.py",
+      "pdf": {
+        "path": "paper/paper_100b_crown_resilience.pdf",
+        "size_bytes": 94052,
+        "sha256": "b55df0d23790b5dada0e5ba8cb40d11806f92a34a9e8c1750e68b01a6b828253"
+      },
+      "arxiv_bundle": {
+        "filename": "arxiv_paper_100b_crown_resilience.tar.gz",
+        "rel_path": "docs/submissions/arxiv_paper_100b_crown_resilience.tar.gz",
+        "size_bytes": 4500,
+        "sha256": "945e47d9bd5f79d931ab0def5d7de39b3d7605b5e8810d47517a6806673b7b79"
+      },
+      "zenodo_bundle": {
+        "filename": "zenodo_paper_100b_crown_resilience.zip",
+        "rel_path": "docs/submissions/zenodo_paper_100b_crown_resilience.zip",
+        "size_bytes": 97473,
+        "sha256": "0624d656e94dbd0a2ed6b01f7e7c16bc74027ae14a3abd7bbf1e2a8df6dff495"
+      }
     },
     {
       "id": "paper_earth2_cupti_blackwell",
       "title": "Subgrid-Scale Turbulence Closure and 44.01x Speedup on Blackwell SM120: Matrix-Free Fused Triton Kernels for High-Resolution Global Climate Modeling",
       "tex_file": "paper/paper_earth2_cupti_blackwell.tex",
       "primary_category": "cs.DC",
-      "secondary_categories": ["physics.ao-ph", "physics.flu-dyn"],
+      "secondary_categories": [
+        "physics.ao-ph",
+        "physics.flu-dyn"
+      ],
       "scale_nodes": 103824000,
       "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
       "measured_speedup_vs_pytorch": 44.01,
@@ -34,47 +59,125 @@
       "compiler_registers_per_thread": 40,
       "compiler_spills_bytes": 0,
       "trace_artifact": "docs/evidence/nsight_cupti_triton_trace.json",
-      "figure_artifact": "docs/evidence/nsight_earth2_gpu_trace_evidence.png"
+      "figure_artifact": "docs/evidence/nsight_earth2_gpu_trace_evidence.png",
+      "pdf": {
+        "path": "paper/paper_earth2_cupti_blackwell.pdf",
+        "size_bytes": 320706,
+        "sha256": "e0c88fb599732daacbd2b74836dbe855a199826a5f251f6d7e871305baa94a9a"
+      },
+      "arxiv_bundle": {
+        "filename": "arxiv_paper_earth2_cupti_blackwell.tar.gz",
+        "rel_path": "docs/submissions/arxiv_paper_earth2_cupti_blackwell.tar.gz",
+        "size_bytes": 262361,
+        "sha256": "dc5db9bc386f758eb816140b0b8e044a9b177965a38c9233811c7ccfb9d81489"
+      },
+      "zenodo_bundle": {
+        "filename": "zenodo_paper_earth2_cupti_blackwell.zip",
+        "rel_path": "docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip",
+        "size_bytes": 568807,
+        "sha256": "5262dad61d40b44b5d9b1e158b588442fb732e5b7b320edb4fefeb6db6560e8d"
+      }
     },
     {
       "id": "paper_defi_mainnet_sentinel",
       "title": "Sub-Millisecond Mainnet Financial Contagion Sentinel: Detecting High-Frequency Liquidity Cascades at 1,546 GB/s via Fused Hypercube Tensor Kernels",
       "tex_file": "paper/paper_defi_mainnet_sentinel.tex",
       "primary_category": "q-fin.CP",
-      "secondary_categories": ["cs.DC", "cs.CR"],
+      "secondary_categories": [
+        "cs.DC",
+        "cs.CR"
+      ],
       "scale_nodes": 10800000,
       "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
       "measured_latency_ms": 0.0838,
       "measured_bandwidth_gb_s": 1546.39,
       "peak_solvency_risk_detected": 1.0,
-      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py"
+      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py",
+      "pdf": {
+        "path": "paper/paper_defi_mainnet_sentinel.pdf",
+        "size_bytes": 75599,
+        "sha256": "91c2d18144d4217d83f9f5340567e49544ad0d3e0e80bee714505f0dd379b9fb"
+      },
+      "arxiv_bundle": {
+        "filename": "arxiv_paper_defi_mainnet_sentinel.tar.gz",
+        "rel_path": "docs/submissions/arxiv_paper_defi_mainnet_sentinel.tar.gz",
+        "size_bytes": 3754,
+        "sha256": "2b1c5b0e66eee00334cf604e3db6c662c10a0cf69916fe01cf751916d5ad72c8"
+      },
+      "zenodo_bundle": {
+        "filename": "zenodo_paper_defi_mainnet_sentinel.zip",
+        "rel_path": "docs/submissions/zenodo_paper_defi_mainnet_sentinel.zip",
+        "size_bytes": 78569,
+        "sha256": "26fa1ce5df5e55a0a4f44167825039c86acb6be1ee04c433a5dae0911dbf6389"
+      }
     },
     {
       "id": "paper_aerospace_hypersonic_shield",
       "title": "Aerothermal Hypersonic Reentry Simulation at Mach 15: Non-Linear PICA-X Thermal Shield Diffusion at 2,564 GB/s on NVIDIA Blackwell",
       "tex_file": "paper/paper_aerospace_hypersonic_shield.tex",
       "primary_category": "physics.flu-dyn",
-      "secondary_categories": ["physics.comp-ph", "cs.CE"],
+      "secondary_categories": [
+        "physics.comp-ph",
+        "cs.CE"
+      ],
       "scale_nodes": 10800000,
       "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
       "measured_latency_ms": 0.0505,
       "measured_bandwidth_gb_s": 2564.91,
       "aerothermal_regime": "Mach 15 Reentry Shock Layer",
-      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py"
+      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py",
+      "pdf": {
+        "path": "paper/paper_aerospace_hypersonic_shield.pdf",
+        "size_bytes": 72342,
+        "sha256": "8a1ded84bf35caac53041e97ac9b56a46c66826aff66735641173e12387d812b"
+      },
+      "arxiv_bundle": {
+        "filename": "arxiv_paper_aerospace_hypersonic_shield.tar.gz",
+        "rel_path": "docs/submissions/arxiv_paper_aerospace_hypersonic_shield.tar.gz",
+        "size_bytes": 3361,
+        "sha256": "9c4487e7056476e4eb535e3bb37b88f7034f9e3ae38dee0f5b6bc3d02ec2cbdb"
+      },
+      "zenodo_bundle": {
+        "filename": "zenodo_paper_aerospace_hypersonic_shield.zip",
+        "rel_path": "docs/submissions/zenodo_paper_aerospace_hypersonic_shield.zip",
+        "size_bytes": 75821,
+        "sha256": "d1d7f1c0613879899b8baf8e38d6d50a33f1cd22389fbbcd5e343d810fc729ed"
+      }
     },
     {
       "id": "paper_taylor_green_vortex",
       "title": "High-Fidelity Taylor-Green Vortex Hydrodynamic State Assimilation and Regularized Adjoint Inversion at 2,967 GB/s on NVIDIA Blackwell",
       "tex_file": "paper/paper_taylor_green_vortex.tex",
       "primary_category": "physics.flu-dyn",
-      "secondary_categories": ["physics.comp-ph", "cs.DC"],
+      "secondary_categories": [
+        "physics.comp-ph",
+        "cs.DC"
+      ],
       "scale_nodes": 10800000,
       "hardware_target": "NVIDIA RTX PRO 6000 Blackwell Server Edition (94.97 GB VRAM, sm_120)",
       "measured_latency_ms": 0.0437,
       "measured_bandwidth_gb_s": 2967.03,
       "mass_divergence_residual": 0.0,
-      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py"
+      "reproducible_benchmark": "benchmarks/triple_industrial_meru_triton.py",
+      "pdf": {
+        "path": "paper/paper_taylor_green_vortex.pdf",
+        "size_bytes": 69353,
+        "sha256": "a31b4f71eb334d1274612043c028c4408f38128c0a327353adde66edfeb23f4b"
+      },
+      "arxiv_bundle": {
+        "filename": "arxiv_paper_taylor_green_vortex.tar.gz",
+        "rel_path": "docs/submissions/arxiv_paper_taylor_green_vortex.tar.gz",
+        "size_bytes": 3230,
+        "sha256": "19f76d0348a15cacda8722b4eb4d4858ecae2fbe9f56a2a7d3c1f6fb934ea22d"
+      },
+      "zenodo_bundle": {
+        "filename": "zenodo_paper_taylor_green_vortex.zip",
+        "rel_path": "docs/submissions/zenodo_paper_taylor_green_vortex.zip",
+        "size_bytes": 72650,
+        "sha256": "b28545a2b423b27667ea885aed18fe8772887f9d64a2627ac077998114cb8c09"
+      }
     }
   ],
-  "status": "READY_FOR_OPERATOR_APPROVAL"
+  "status": "OPERATOR_APPROVED_PUBLISHED",
+  "approval_timestamp": "2026-11-01T16:47:00Z"
 }
