@@ -18,7 +18,9 @@
       "filename": "zenodo_paper_100b_crown_resilience.zip",
       "rel_path": "docs/submissions/zenodo_paper_100b_crown_resilience.zip",
       "size_bytes": 97473,
-      "sha256": "0624d656e94dbd0a2ed6b01f7e7c16bc74027ae14a3abd7bbf1e2a8df6dff495"
+      "sha256": "0624d656e94dbd0a2ed6b01f7e7c16bc74027ae14a3abd7bbf1e2a8df6dff495",
+      "doi": "10.5281/zenodo.23871039",
+      "record_url": "https://zenodo.org/records/23871039"
     }
   },
   {
@@ -40,7 +42,9 @@
       "filename": "zenodo_paper_earth2_cupti_blackwell.zip",
       "rel_path": "docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip",
       "size_bytes": 568807,
-      "sha256": "5262dad61d40b44b5d9b1e158b588442fb732e5b7b320edb4fefeb6db6560e8d"
+      "sha256": "5262dad61d40b44b5d9b1e158b588442fb732e5b7b320edb4fefeb6db6560e8d",
+      "doi": "10.5281/zenodo.23871045",
+      "record_url": "https://zenodo.org/records/23871045"
     }
   },
   {
@@ -62,7 +66,9 @@
       "filename": "zenodo_paper_defi_mainnet_sentinel.zip",
       "rel_path": "docs/submissions/zenodo_paper_defi_mainnet_sentinel.zip",
       "size_bytes": 78569,
-      "sha256": "26fa1ce5df5e55a0a4f44167825039c86acb6be1ee04c433a5dae0911dbf6389"
+      "sha256": "26fa1ce5df5e55a0a4f44167825039c86acb6be1ee04c433a5dae0911dbf6389",
+      "doi": "10.5281/zenodo.23871051",
+      "record_url": "https://zenodo.org/records/23871051"
     }
   },
   {
@@ -84,7 +90,9 @@
       "filename": "zenodo_paper_aerospace_hypersonic_shield.zip",
       "rel_path": "docs/submissions/zenodo_paper_aerospace_hypersonic_shield.zip",
       "size_bytes": 75821,
-      "sha256": "d1d7f1c0613879899b8baf8e38d6d50a33f1cd22389fbbcd5e343d810fc729ed"
+      "sha256": "d1d7f1c0613879899b8baf8e38d6d50a33f1cd22389fbbcd5e343d810fc729ed",
+      "doi": "10.5281/zenodo.23871059",
+      "record_url": "https://zenodo.org/records/23871059"
     }
   },
   {
@@ -106,7 +114,9 @@
       "filename": "zenodo_paper_taylor_green_vortex.zip",
       "rel_path": "docs/submissions/zenodo_paper_taylor_green_vortex.zip",
       "size_bytes": 72650,
-      "sha256": "b28545a2b423b27667ea885aed18fe8772887f9d64a2627ac077998114cb8c09"
+      "sha256": "b28545a2b423b27667ea885aed18fe8772887f9d64a2627ac077998114cb8c09",
+      "doi": "10.5281/zenodo.23871065",
+      "record_url": "https://zenodo.org/records/23871065"
     }
   }
 ]

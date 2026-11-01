@@ -1,0 +1,32 @@
+[
+  {
+    "id": "paper_100b_crown_resilience",
+    "dep_id": 23871039,
+    "doi": "10.5281/zenodo.23871039",
+    "url": "https://zenodo.org/records/23871039"
+  },
+  {
+    "id": "paper_earth2_cupti_blackwell",
+    "dep_id": 23871045,
+    "doi": "10.5281/zenodo.23871045",
+    "url": "https://zenodo.org/records/23871045"
+  },
+  {
+    "id": "paper_defi_mainnet_sentinel",
+    "dep_id": 23871051,
+    "doi": "10.5281/zenodo.23871051",
+    "url": "https://zenodo.org/records/23871051"
+  },
+  {
+    "id": "paper_aerospace_hypersonic_shield",
+    "dep_id": 23871059,
+    "doi": "10.5281/zenodo.23871059",
+    "url": "https://zenodo.org/records/23871059"
+  },
+  {
+    "id": "paper_taylor_green_vortex",
+    "dep_id": 23871065,
+    "doi": "10.5281/zenodo.23871065",
+    "url": "https://zenodo.org/records/23871065"
+  }
+]

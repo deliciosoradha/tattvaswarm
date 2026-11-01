@@ -10,6 +10,8 @@
 
 ## 1. Paper 1 (Crown Jewel): 100 Billion Nodes Systemic Resilience
 
+- **Zenodo DOI Oficial:** [10.5281/zenodo.23871039](https://zenodo.org/records/23871039)
+
 - **Archivo fuente LaTeX:** [`paper/paper_100b_crown_resilience.tex`](paper/paper_100b_crown_resilience.tex)
 - **Título en inglés:** *Sub-Second Global Systemic Resilience Analysis of 100 Billion Coupled Urban-Financial Nodes via Meru-Piṅgala Hypercube Stratification*
 - **Categorías arXiv sugeridas:** `cs.DC` (Distributed, Parallel, and Cluster Computing), `cs.CE` (Computational Engineering, Finance, and Science), `physics.comp-ph` (Computational Physics), `q-fin.CP` (Computational Finance), `math.CO` (Combinatorics).
@@ -27,6 +29,8 @@
 
 ## 2. Paper 2: Earth-2 Subgrid Turbulence Closure & 44.01× Speedup en Blackwell
 
+- **Zenodo DOI Oficial:** [10.5281/zenodo.23871045](https://zenodo.org/records/23871045)
+
 - **Archivo fuente LaTeX:** [`paper/paper_earth2_cupti_blackwell.tex`](paper/paper_earth2_cupti_blackwell.tex)
 - **Título en inglés:** *Subgrid-Scale Turbulence Closure and 44.01× Speedup on Blackwell SM120: Matrix-Free Fused Triton Kernels for High-Resolution Global Climate Modeling*
 - **Categorías arXiv sugeridas:** `cs.DC` (Parallel Computing), `physics.ao-ph` (Atmospheric and Oceanic Physics), `physics.flu-dyn` (Fluid Dynamics).
@@ -42,6 +46,8 @@
 ---
 
 ## 3. Paper 3: Sub-Millisecond Mainnet Financial Contagion Sentinel
+
+- **Zenodo DOI Oficial:** [10.5281/zenodo.23871051](https://zenodo.org/records/23871051)
 
 - **Archivo fuente LaTeX:** [`paper/paper_defi_mainnet_sentinel.tex`](paper/paper_defi_mainnet_sentinel.tex)
 - **Título en inglés:** *Sub-Millisecond Mainnet Financial Contagion Sentinel: Detecting High-Frequency Liquidity Cascades at 1,546 GB/s via Fused Hypercube Tensor Kernels*
@@ -59,6 +65,8 @@
 
 ## 4. Paper 4: Aerothermal Hypersonic Reentry Simulation at Mach 15 (PICA-X)
 
+- **Zenodo DOI Oficial:** [10.5281/zenodo.23871059](https://zenodo.org/records/23871059)
+
 - **Archivo fuente LaTeX:** [`paper/paper_aerospace_hypersonic_shield.tex`](paper/paper_aerospace_hypersonic_shield.tex)
 - **Título en inglés:** *Aerothermal Hypersonic Reentry Simulation at Mach 15: Non-Linear PICA-X Thermal Shield Diffusion at 2,564 GB/s on NVIDIA Blackwell*
 - **Categorías arXiv sugeridas:** `physics.flu-dyn` (Fluid Dynamics), `physics.comp-ph` (Computational Physics), `cs.CE` (Computational Engineering).
@@ -75,6 +83,8 @@
 ---
 
 ## 5. Paper 5: Taylor-Green Hydrodynamic Assimilation & Enstrophy Inversion
+
+- **Zenodo DOI Oficial:** [10.5281/zenodo.23871065](https://zenodo.org/records/23871065)
 
 - **Archivo fuente LaTeX:** [`paper/paper_taylor_green_vortex.tex`](paper/paper_taylor_green_vortex.tex)
 - **Título en inglés:** *High-Fidelity Taylor-Green Vortex Hydrodynamic State Assimilation and Regularized Adjoint Inversion at 2,967 GB/s on NVIDIA Blackwell*
