@@ -176,6 +176,20 @@ All benchmarks below were executed directly on an **NVIDIA RTX PRO 6000 Blackwel
 
 Compiler SASS/PTX analysis on Blackwell (`sm_120`): **40 registers/thread**, 0 local spills, 100% memory coalescing.
 
+## Scientific Papers & Preprints (Blackwell SM120 Suite)
+
+Each milestone verified on the NVIDIA RTX PRO 6000 Blackwell GPU is authored as an independent, monolithic IEEE/ACM-style publication with standalone source code, PDF, and distribution packages:
+
+| Paper / Research Focus | PDF Document | arXiv Source Bundle | Zenodo Release Package | Category |
+|---|---|---|---|---|
+| **1. 100 Billion Nodes Resilience Engine** | [`paper/paper_100b_crown_resilience.pdf`](paper/paper_100b_crown_resilience.pdf) | [`arxiv_paper_100b_crown_resilience.tar.gz`](docs/submissions/arxiv_paper_100b_crown_resilience.tar.gz) | [`zenodo_paper_100b_crown_resilience.zip`](docs/submissions/zenodo_paper_100b_crown_resilience.zip) | `cs.DC` / `cs.CE` |
+| **2. Earth-2 Subgrid Turbulence Closure** | [`paper/paper_earth2_cupti_blackwell.pdf`](paper/paper_earth2_cupti_blackwell.pdf) | [`arxiv_paper_earth2_cupti_blackwell.tar.gz`](docs/submissions/arxiv_paper_earth2_cupti_blackwell.tar.gz) | [`zenodo_paper_earth2_cupti_blackwell.zip`](docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip) | `cs.DC` / `physics.ao-ph` |
+| **3. DeFi Mainnet Risk Sentinel** | [`paper/paper_defi_mainnet_sentinel.pdf`](paper/paper_defi_mainnet_sentinel.pdf) | [`arxiv_paper_defi_mainnet_sentinel.tar.gz`](docs/submissions/arxiv_paper_defi_mainnet_sentinel.tar.gz) | [`zenodo_paper_defi_mainnet_sentinel.zip`](docs/submissions/zenodo_paper_defi_mainnet_sentinel.zip) | `q-fin.CP` / `cs.DC` |
+| **4. Hypersonic Reentry Shield (Mach 15)** | [`paper/paper_aerospace_hypersonic_shield.pdf`](paper/paper_aerospace_hypersonic_shield.pdf) | [`arxiv_paper_aerospace_hypersonic_shield.tar.gz`](docs/submissions/arxiv_paper_aerospace_hypersonic_shield.tar.gz) | [`zenodo_paper_aerospace_hypersonic_shield.zip`](docs/submissions/zenodo_paper_aerospace_hypersonic_shield.zip) | `physics.flu-dyn` / `cs.CE` |
+| **5. Taylor-Green Vortex Hydrodynamics** | [`paper/paper_taylor_green_vortex.pdf`](paper/paper_taylor_green_vortex.pdf) | [`arxiv_paper_taylor_green_vortex.tar.gz`](docs/submissions/arxiv_paper_taylor_green_vortex.tar.gz) | [`zenodo_paper_taylor_green_vortex.zip`](docs/submissions/zenodo_paper_taylor_green_vortex.zip) | `physics.flu-dyn` / `cs.DC` |
+
+Full submission metadata sheet, abstracts, and SHA-256 integrity checksums: [`paper/SUBMISSION_METADATA_SHEET.md`](paper/SUBMISSION_METADATA_SHEET.md) and [`docs/submissions/package_manifest.json`](docs/submissions/package_manifest.json).
+
 ## Native CUDA C++ Kernels (`/gpu-kernels/`)
 
 Production-grade CUDA C++ kernels located in [`gpu-kernels/cuda/`](gpu-kernels/cuda/):
