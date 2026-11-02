@@ -26,3 +26,6 @@ venv/
 
 # Rust engine build artifacts
 engine/target/
+
+# Rust target directories
+**/target/
