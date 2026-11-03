@@ -61,3 +61,18 @@
   coders objetivo de los adapters, red social y MCP a usar.
 - **Dependency:** tras cierre META; coordinar con POST-01/02.
 - **Estado:** QUEUED — no lanzar sin tus confirmaciones.
+- **Sub-tarea medición de fuentes (`til_network`/`fdtd_phaseop`):**
+  `SKIPPED_MISSING_SOURCE` — búsqueda ampliada
+  `find /home/delideli -maxdepth 5` (incluye `~/lab-master` y
+  `~/Documentos/3333`) sin ningún resultado (2026-11-03). Hipótesis:
+  backups en Drive (rclone `gdrive:`) / Linode o instancia mcphub/cpu.
+  Auditoría de DBs grandes en Drive en curso. Reabrir solo si las
+  fuentes aparecen; sin fuentes no se calcula ningún delta.
+
+### POST-04 — hello-os + HK-1 sincronizados a lab-master
+- **DONE 2026-11-03:** commit `7caca29` (push OK) en
+  `lab-master/reports/hello_hk1_20261103/`: `hello_os/` (11 archivos,
+  testbench iverilog 3/0), bundle HK-1 íntegro (SHA256SUMS 7/7 OK) y
+  reporte de síntesis corregido — Yosys 0.52 = **4,268 celdas**, sim
+  HK-1 PASS con 6,667 checks. La cifra previa de 7,810 celdas queda
+  retractada (ruta inexistente). Rama del hackathon intacta.
