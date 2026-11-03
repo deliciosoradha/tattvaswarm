@@ -38,4 +38,26 @@
 - **Dependency:** tras cierre META; coordinar orden con POST-01.
 - **DoD:** N agentes en G4, tasa hallazgo vs brute force, % uso GPU/VRAM,
   ledger de costos del run.
+- **Workload diana:** `lab-master/scripts/colab_cybersec_benchmark_runner.py`
+  (30 escenarios red/blue-team, 5 categorías; exige CUDA — verificado que
+  aborta sin GPU/torch local; corrida completa solo en G4).
 - **Estado:** QUEUED.
+
+### POST-03 — Launch onchain x402 + proxy MPP (service token por feature)
+- **Scope:** servicio con token por feature para optimizar calls; adapters
+  para cualquier coder; suite de 10 benchmarks reales con Hermes/agy +
+  Meta Muse (best model o default config); docs + paper + post social vía
+  MCPs; configurar todo.
+- **Gates obligatorios (sin excepción):** (1) ninguna tx onchain sin
+  confirmación explícita previa (monto, token, destino, gas); (2) ningún
+  post social sin texto aprobado por ti; (3) ninguna provisión con costo
+  sin confirmar.
+- **Seller path x402:** Circle Gateway Nanopayments por defecto (proxy
+  Express con middleware, redes desde docs/inspect en vivo sin hardcodear);
+  testnet primero; marketplace como submission package, no publicación instantánea.
+- **Seguridad fondos:** USDC irreversible — `--estimate` primero,
+  `--max-amount` ceñido al precio, buyer wallet solo como harness final.
+- **Por definir:** las 10 tareas benchmark, chain + wallet + presupuesto,
+  coders objetivo de los adapters, red social y MCP a usar.
+- **Dependency:** tras cierre META; coordinar con POST-01/02.
+- **Estado:** QUEUED — no lanzar sin tus confirmaciones.
