@@ -112,7 +112,22 @@
 
 ---
 
-## 6. Resumen de Tarjetas Hermes Kanban y Acciones del Swarm
+## 6. Paper 6: Combinatorial Finite-Action Subsequence Matching for C2 Telemetry Forensics
+
+- **Archivo fuente LaTeX:** [`paper/paper_c2_meruprastara_telemetry.tex`](paper/paper_c2_meruprastara_telemetry.tex)
+- **Título en inglés:** *Combinatorial Finite-Action Subsequence Matching for C2 Telemetry Forensics: Empirical Validation across 4.97M Ingestion Events on Distributed Sensing Nodes*
+- **Categorías arXiv sugeridas:** `cs.CR` (Cryptography and Security), `cs.DC` (Distributed Computing), `cs.SE` (Software Engineering).
+- **Métricas de hardware y red verificadas:**
+  - Nodos sensores: **20 vantage points distribuidos en 3 continentes** (Norteamérica, Europa Occidental, Asia-Pacífico).
+  - Eventos analizados: **4,971,122 eventos** ingestados en 605,094 segundos (~7.07 días).
+  - Tasa agregada: **8.215 ev/s** ($\sim 686\text{k ev/día}$).
+  - IPs activas identificadas: **551 IPs**, con 9,022 eventos por cubeta de telemetría e ingesta sincronizada.
+  - Mitigación: Despliegue de reglas eBPF/XDP locales y señalización upstream RTBH (Remotely Triggered Black Hole).
+- **Script reproducible:** [`src/meruprastara_matcher.py`](src/meruprastara_matcher.py) (en repo público `c2-telemetry-meruprastara-public`).
+
+---
+
+## 7. Resumen de Tarjetas Hermes Kanban y Acciones del Swarm
 
 | Paper | Archivo LaTeX | Tarjeta Kanban | Estado | Paquete arXiv (`.tar.gz`) | Paquete Zenodo (`.zip`) |
 |---|---|---|---|---|---|
@@ -121,18 +136,19 @@
 | Paper 3: DeFi Mainnet Sentinel | `paper/paper_defi_mainnet_sentinel.tex` (`.pdf` 76 KB) | `t_7b25b1d3` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_defi_mainnet_sentinel.tar.gz` | `docs/submissions/zenodo_paper_defi_mainnet_sentinel.zip` |
 | Paper 4: Aerotérmico PICA-X Mach 15 | `paper/paper_aerospace_hypersonic_shield.tex` (`.pdf` 72 KB) | `t_5d14ca1a` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_aerospace_hypersonic_shield.tar.gz` | `docs/submissions/zenodo_paper_aerospace_hypersonic_shield.zip` |
 | Paper 5: Taylor-Green Vortex | `paper/paper_taylor_green_vortex.tex` (`.pdf` 69 KB) | `t_113e6513` | APROBADO & PUBLICADO | `docs/submissions/arxiv_paper_taylor_green_vortex.tar.gz` | `docs/submissions/zenodo_paper_taylor_green_vortex.zip` |
+| Paper 6: C2 Meruprastāra Forensics | `paper/paper_c2_meruprastara_telemetry.tex` (`.pdf` 102 KB) | `t_99e06299` | APROBADO & PUBLICADO | Documentación en `c2-telemetry-meruprastara-public` | Checksums SHA-256 verificados |
 | Submission & Swarm Metadata | `paper/submission_metadata.json` | `t_99e06299` | APROBADO & PUBLICADO | Manifest: `docs/submissions/package_manifest.json` | Checksums SHA-256 verificados |
 
 ---
 
-## 7. Tabla de Integridad y Checksums Criptográficos (SHA-256)
+## 8. Tabla de Integridad y Checksums Criptográficos (SHA-256)
 
 | Artefacto | Tamaño | SHA-256 Checksum |
 |---|---|---|
 | `paper/paper_100b_crown_resilience.pdf` | 94,052 B | `b55df0d23790b5dada0e5ba8cb40d11806f92a34a9e8c1750e68b01a6b828253` |
 | `docs/submissions/arxiv_paper_100b_crown_resilience.tar.gz` | 4,500 B | `945e47d9bd5f79d931ab0def5d7de39b3d7605b5e8810d47517a6806673b7b79` |
 | `docs/submissions/zenodo_paper_100b_crown_resilience.zip` | 97,473 B | `0624d656e94dbd0a2ed6b01f7e7c16bc74027ae14a3abd7bbf1e2a8df6dff495` |
-| `paper/paper_earth2_cupti_blackwell.pdf` | 320,706 B | `e0c88fb599732daacbd2b74836dbe855a199826a5f251f6d7e871305baa94a9a` |
+| `paper/paper_earth2_cupti_blackwell.pdf` | 320,873 B | `6d3086cd86b67820c5059b4efceb3b9c5c7bcfac289f4a660b494cfe1491c854` |
 | `docs/submissions/arxiv_paper_earth2_cupti_blackwell.tar.gz` | 262,361 B | `dc5db9bc386f758eb816140b0b8e044a9b177965a38c9233811c7ccfb9d81489` |
 | `docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip` | 568,807 B | `5262dad61d40b44b5d9b1e158b588442fb732e5b7b320edb4fefeb6db6560e8d` |
 | `paper/paper_defi_mainnet_sentinel.pdf` | 75,599 B | `91c2d18144d4217d83f9f5340567e49544ad0d3e0e80bee714505f0dd379b9fb` |
@@ -144,4 +160,5 @@
 | `paper/paper_taylor_green_vortex.pdf` | 69,353 B | `a31b4f71eb334d1274612043c028c4408f38128c0a327353adde66edfeb23f4b` |
 | `docs/submissions/arxiv_paper_taylor_green_vortex.tar.gz` | 3,230 B | `19f76d0348a15cacda8722b4eb4d4858ecae2fbe9f56a2a7d3c1f6fb934ea22d` |
 | `docs/submissions/zenodo_paper_taylor_green_vortex.zip` | 72,650 B | `b28545a2b423b27667ea885aed18fe8772887f9d64a2627ac077998114cb8c09` |
+| `paper/paper_c2_meruprastara_telemetry.pdf` | 102,291 B | `f5f28ff645a1da8c732bb67e419a2b1e5394037c6ed37425c961053890149050` |
 

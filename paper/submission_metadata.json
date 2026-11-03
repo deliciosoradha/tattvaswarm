@@ -62,8 +62,8 @@
       "figure_artifact": "docs/evidence/nsight_earth2_gpu_trace_evidence.png",
       "pdf": {
         "path": "paper/paper_earth2_cupti_blackwell.pdf",
-        "size_bytes": 320706,
-        "sha256": "e0c88fb599732daacbd2b74836dbe855a199826a5f251f6d7e871305baa94a9a"
+        "size_bytes": 320873,
+        "sha256": "6d3086cd86b67820c5059b4efceb3b9c5c7bcfac289f4a660b494cfe1491c854"
       },
       "arxiv_bundle": {
         "filename": "arxiv_paper_earth2_cupti_blackwell.tar.gz",
@@ -76,7 +76,9 @@
         "rel_path": "docs/submissions/zenodo_paper_earth2_cupti_blackwell.zip",
         "size_bytes": 568807,
         "sha256": "5262dad61d40b44b5d9b1e158b588442fb732e5b7b320edb4fefeb6db6560e8d"
-      }
+      },
+      "speedup_factor": "44.01x",
+      "occupancy_theoretical": "91.4%"
     },
     {
       "id": "paper_defi_mainnet_sentinel",
@@ -175,6 +177,28 @@
         "rel_path": "docs/submissions/zenodo_paper_taylor_green_vortex.zip",
         "size_bytes": 72650,
         "sha256": "b28545a2b423b27667ea885aed18fe8772887f9d64a2627ac077998114cb8c09"
+      }
+    },
+    {
+      "id": "paper_c2_meruprastara_telemetry",
+      "title": "Combinatorial Finite-Action Subsequence Matching for C2 Telemetry Forensics: Empirical Validation across 4.97M Ingestion Events on Distributed Sensing Nodes",
+      "tex_file": "paper/paper_c2_meruprastara_telemetry.tex",
+      "primary_category": "cs.CR",
+      "secondary_categories": [
+        "cs.DC",
+        "cs.SE",
+        "math.CO"
+      ],
+      "scale_nodes": 20,
+      "hardware_target": "Distributed Sensor Mesh (20 vantage points, 3 continents, XDP/eBPF)",
+      "measured_execution_time_seconds": 605094,
+      "measured_events_ingested": 4971122,
+      "measured_event_rate_ev_s": 8.215,
+      "reproducible_benchmark": "src/meruprastara_matcher.py",
+      "pdf": {
+        "path": "paper/paper_c2_meruprastara_telemetry.pdf",
+        "size_bytes": 102291,
+        "sha256": "f5f28ff645a1da8c732bb67e419a2b1e5394037c6ed37425c961053890149050"
       }
     }
   ],
