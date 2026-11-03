@@ -26,3 +26,16 @@
 - **Dependency:** arranca solo tras cerrar META-01–META-06.
 - **DoD:** endpoint vivo + 1 job real de prueba + doc de precios/límites.
 - **Estado:** QUEUED — no implementar en este sprint.
+
+### POST-02 — Ronda masiva swarm en Colab (colab-cli + G4) + Atman gate (Rust)
+- **Scope:** ronda masiva de agentes investigadores sobre Tattva-Swarm /
+  Shiva / Meru vía Colab MCP con colab-cli en GPU G4. Gate Atman en Rust
+  como filtro inteligente (no brute force) + medición de hardware al 100%.
+- **Recon local:** cargo/rustc 1.99.0 OK (gate compilable en CPU);
+  colab-cli ausente (instalar); sin GPU local (nvidia-smi ausente).
+- **Por confirmar:** GPU "G4" exacta (¿tier Colab/RunPod/L4?), auth de Colab,
+  presupuesto del run. Sin GPU provisionada sin costo confirmado.
+- **Dependency:** tras cierre META; coordinar orden con POST-01.
+- **DoD:** N agentes en G4, tasa hallazgo vs brute force, % uso GPU/VRAM,
+  ledger de costos del run.
+- **Estado:** QUEUED.
