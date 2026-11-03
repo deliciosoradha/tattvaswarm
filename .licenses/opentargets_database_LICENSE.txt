@@ -1,0 +1,4 @@
+NOTICE: On 2026-11-03 (UTC), the user was notified to review the Open Targets
+Platform licence terms at https://platform-docs.opentargets.org/licence before
+any query to the Open Targets Platform GraphQL API via the opentargets-database skill.
+Queries are executed only through the provided wrapper script with --output to file.

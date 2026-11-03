@@ -1,0 +1,11 @@
+{
+  "grid_h": 512,
+  "grid_w": 512,
+  "block": 16,
+  "triton_grid": [
+    32,
+    32
+  ],
+  "mask_coverage": 0.3016510009765625,
+  "num_masked_cells": 79076
+}
