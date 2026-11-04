@@ -86,3 +86,55 @@
   reporte de síntesis corregido — Yosys 0.52 = **4,268 celdas**, sim
   HK-1 PASS con 6,667 checks. La cifra previa de 7,810 celdas queda
   retractada (ruta inexistente). Rama del hackathon intacta.
+
+## SUBMIT — Paquete de envíos (preparado 2026-11-03)
+
+### SUBMIT-01 — Zenodo (paper forense Samsara)
+- **Artefactos:** `lab-master/reports/samsara_forensic_20261103/`
+  (`INFORME_FORENSE_SAMSARA_20261103.md`, `paper_samsara_forensic.pdf`,
+  `PLAN_RELANZAMIENTO.md`), commits `88b99e2` + `9c77df3` pusheados.
+- **DoD:** subir PDF a Zenodo (nuevo registro o versión), obtener DOI,
+  pegar DOI en README de lab-master y en este kanban.
+- **Bloqueo:** requiere tu sesión/token Zenodo. No ejecuto sin que lo abras tú.
+- **Estado:** READY (artefactos listos; falta tu login).
+
+### SUBMIT-02 — Cerebral Valley (Meta Global AI Developer Hackathon)
+- **Campos pre-llenados:** ver `SUBMISSION_FORM.md` en la raíz del repo.
+- **DoD:** formulario enviado antes de Nov 4, 9:00 PM EST + screenshot de
+  confirmación guardado en `session/`.
+- **Bloqueos:** META-01 (claves/créditos), META-05 (video ≤3:00). El envío
+  sin inferencia en vivo verificable pierde el premio Open Weights ($10K);
+  enviar igual por track principal si el video está.
+- **Estado:** READY-WITH-BLOCKERS.
+
+### SUBMIT-03 — Hugging Face (bucket de artefactos)
+- **Contenido:** paper Shiva-Muse (PDF), dataset sintético Samsara
+  (cuando exista, Fase A del plan), tarjeta de dataset con procedencia.
+- **DoD:** repo HF público con `README.md` (dataset card) + archivos.
+- **Credencial:** `HF_TOKEN` presente en `~/.env` (verificado por nombre;
+  nunca impreso). La subida la disparo solo con tu OK.
+- **Estado:** READY (falta tu OK para subir).
+
+### DOC-01 — Wiki del proyecto
+- **Artefactos:** carpeta `wiki/` (Home, Arquitectura, Forense-Samsara,
+  Reproducibilidad) versionada en el repo y enlazada desde README.
+- **DoD:** `wiki/Home.md` + 3 páginas, enlazadas y pusheadas.
+- **Estado:** IN_PROGRESS.
+
+### AUDIT-E2E — Auditoría extremo a extremo del hackathon
+- **Artefacto:** `auditor_estricto_meta.py` (raíz) ejecutado; veredicto
+  registrado en este kanban y en `session/`.
+- **DoD:** script corre limpio y su salida queda en el repo; los fallos
+  por claves (META-01) se documentan como bloqueos del usuario, no se
+  maquillan.
+- **Estado:** IN_PROGRESS.
+
+### COLAB-DATA — Dataset sintético + LoRA + RL (Colab GPU)
+- **Plan:** `lab-master/reports/samsara_forensic_20261103/PLAN_RELANZAMIENTO.md` §3
+  (Fase A dataset/Data Designer → Fase B LoRA PEFT → Fase C RL GRPO/DPO
+  sobre replay, todo en Colab GPU Blackwell ya conectada).
+- **DoD fase A:** script `samsara_synthetic_funding.py` con
+  `load_config_builder()` + muestra generada en Colab (100k filas).
+- **Gates:** sin claves Meta no hay juez LLM en vivo; el host local no
+  corre nada pesado (orden del usuario).
+- **Estado:** QUEUED (diseño listo en el plan; ejecutar en Colab).
