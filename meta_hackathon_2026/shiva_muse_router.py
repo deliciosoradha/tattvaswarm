@@ -11,8 +11,10 @@ import os
 import json
 import time
 import hashlib
+import urllib.request
+import urllib.error
 from dataclasses import dataclass
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 
 @dataclass
@@ -57,13 +59,14 @@ class ShivaMuseRouter:
     META_API_BASE = os.getenv("META_MODEL_API_URL", "https://api.meta.ai/v1")
     BASETEN_API_BASE = os.getenv("BASETEN_API_URL", "https://inference.baseten.co/v1")
 
+    # Slugs verificados en vivo GET https://api.meta.ai/v1/models (2026-11-05)
     MODEL_CATALOG = {
-        "frontier_reasoning": "muse-spark",
-        "open_weights_swarm": "meta-models/muse-spark-open-1026",
-        "fast_edge_gate": "muse-glimmer",
+        "frontier_reasoning": "muse-spark-1.3",
+        "open_weights_swarm": "meta-models/muse-spark-open-1026",  # Baseten, requiere BASETEN_API_KEY
+        "fast_edge_gate": "muse-spark-1.3-contributor",
         "vision_segmentation": "sam-3.1",
-        "voice_command": "muse-voice-transcribe",
-        "visual_synthesis": "muse-wonder",
+        "voice_command": "muse-voice-transcribe-1.0",
+        "visual_synthesis": "muse-wonder-1.0",
     }
 
     # Per-1k-token cost assumptions for budget guardrail (USD).
@@ -134,6 +137,19 @@ class ShivaMuseRouter:
             "verification_certificate": cert_hash,
             "budget_guardrail": budget_status,
         }
+
+    def gated_dispatch(self, task_id: int, trace: Dict[str, Any],
+                       modality: str = "reasoning") -> Dict[str, Any]:
+        """Shiva enruta (esencia); Ashta decide si vive. Sin gate no hay manifiesto."""
+        try:
+            from ashta_gate import evaluate as _ashta
+        except ImportError:
+            from meta_hackathon_2026.ashta_gate import evaluate as _ashta  # type: ignore
+        gate = _ashta(trace)
+        base = self.dispatch_agent_task(task_id, str(trace.get("question", "")),
+                                        modality=modality)
+        return {**base, "ashta_gate": gate,
+                "status": "MANIFESTED" if gate["verdict"] == "pass" else "VETOED_BY_ASHTA"}
 
 
 if __name__ == "__main__":

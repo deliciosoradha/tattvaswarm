@@ -63,3 +63,49 @@ def test_harness_pass_and_fail():
     bad_v = np.ones_like(v0)
     bad = verify_rollout("m", {"t": 2}, bad_u, bad_v, bad_u, bad_v, dt=10.0, dx=0.01)
     assert bad["status"] == "FAIL"
+
+
+from ashta_gate import evaluate as ashta_evaluate
+
+
+def _grounded_trace():
+    return {
+        "question": "¿El campo Taylor-Green conserva divergencia cero?",
+        "answer": "Sí, conserva divergencia cero dentro de tolerancia; límite: rejilla 32x32.",
+        "claims": [
+            {"text": "div(u)=0 en la rejilla", "evidence": "max_div medido con harness"},
+            {"text": "CFL estable con dt=0.001", "evidence": "cfl_number calculado"},
+        ],
+        "assumptions": ["rejilla uniforme", "flujo incompresible"],
+        "alternatives": ["esquema explícito (rechazado por CFL)", "rejilla 64 (costo)"],
+        "falsifiable_by": "si max_div supera 1e-6 en la traza CUPTI",
+        "uncertainty": 0.05,
+        "invariants": {"cfl": 0.5, "max_div": 1e-9},
+    }
+
+
+def test_ashta_pass_grounded():
+    out = ashta_evaluate(_grounded_trace())
+    assert out["verdict"] == "pass"
+    assert out["scores"]["prithvi"] == 1.0
+    assert out["scores"]["agni"] == 1.0
+    assert len(out["certificate"]) == 64
+
+
+def test_ashta_veto_speculation():
+    speculative = {"question": "q", "answer": "seguramente funciona de maravilla",
+                   "claims": [{"text": "todo saldrá bien", "evidence": ""}]}
+    out = ashta_evaluate(speculative)
+    assert out["verdict"] == "veto"
+    assert any("prithvi" in r for r in out["reasons"])
+    assert any("agni" in r for r in out["reasons"])
+
+
+def test_ashta_certificate_deterministic_and_chains_with_harness():
+    a = ashta_evaluate(_grounded_trace())
+    b = ashta_evaluate(_grounded_trace())
+    assert a["certificate"] == b["certificate"]
+    assert len(a["input_sha256"]) == 64
+    u0, v0 = taylor_green(16)
+    ok = verify_rollout("m", {"t": 1}, u0, v0, u0.copy(), v0.copy(), dt=0.001, dx=0.19)
+    assert ok["status"] == "PASS" and a["verdict"] == "pass"

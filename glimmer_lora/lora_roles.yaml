@@ -1,0 +1,14 @@
+# Glimmer LoRA por rol — training effort (configs, entrenamiento en Colab GPU)
+# NEW WORK Hackathon. No entrenado aún: falta dataset curado + GPU confirmada.
+base_model: meta-models/muse-spark-open-1026  # verificar slug en catálogo antes de entrenar
+method: peft-lora
+roles:
+  gate_fast:      { rank: 8,  alpha: 16, target: [q_proj, v_proj], task: "veto/pass Ashta rápido" }
+  physics_check:  { rank: 16, alpha: 32, target: [q_proj, v_proj, o_proj], task: "CFL/div en PDE" }
+  router_child:   { rank: 8,  alpha: 16, target: [q_proj, v_proj], task: "paridad Meru Q_n" }
+training:
+  epochs: 3
+  lr: 0.0002
+  batch: 8
+  eval: { holdout_ashta_veto_rate: true, harness_pass_rate: true }
+guardrail: { meta_spend_cap_usd: 100, reserve_usd: 50 }
