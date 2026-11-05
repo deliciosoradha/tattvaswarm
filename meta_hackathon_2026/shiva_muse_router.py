@@ -62,7 +62,7 @@ class ShivaMuseRouter:
     # Slugs verificados en vivo GET https://api.meta.ai/v1/models (2026-11-05)
     MODEL_CATALOG = {
         "frontier_reasoning": "muse-spark-1.3",
-        "open_weights_swarm": "meta-models/muse-spark-open-1026",  # Baseten, requiere BASETEN_API_KEY
+        "open_weights_swarm": "meta-models/muse-spark-open",  # Baseten, requiere BASETEN_API_KEY
         "fast_edge_gate": "muse-spark-1.3-contributor",
         "vision_segmentation": "sam-3.1",
         "voice_command": "muse-voice-transcribe-1.0",

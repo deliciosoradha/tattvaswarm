@@ -88,11 +88,11 @@ def run_forensic_audit(repo_root: str = ".") -> int:
         if not lines:
             failures.append("[VERIFICACIÓN DE PARTNER] Log de inferencia vacío (0 llamadas).")
         else:
-            ow = sum(1 for r in lines if r.get("model") == "meta-models/muse-spark-open-1026")
+            ow = sum(1 for r in lines if str(r.get("model", "")).startswith("meta-models/muse-spark-open"))
             spend = float(lines[-1].get("cumulative_meta_spend_usd", 0.0))
             reserve = float(lines[-1].get("untouched_reserve_usd", 0.0))
             if ow == 0:
-                failures.append("[OPEN WEIGHTS $10K] 0 llamadas a 'meta-models/muse-spark-open-1026'.")
+                failures.append("[OPEN WEIGHTS $10K] 0 llamadas a 'meta-models/muse-spark-open*' (slug real Baseten 2026-11-05).")
             if spend > 100.00 or reserve < 50.00:
                 failures.append(
                     f"[PRESUPUESTO] Gasto=${spend:.2f}, Reserva=${reserve:.2f} "
