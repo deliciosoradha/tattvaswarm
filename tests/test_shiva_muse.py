@@ -33,7 +33,7 @@ def test_budget_guardrail_never_exceeds_cap():
         assert router.ledger.current_spend_usd <= router.ledger.hard_spend_cap_usd + 1e-9
         # After cap, must overflow to open weights with $0 cost
         res = router.dispatch_agent_task(0, "overflow", modality="reasoning", estimated_tokens=100000)
-        assert res["model"] == "meta-models/muse-spark-open-1026"
+        assert res["model"] == "meta-models/muse-spark-open"
         assert res["budget_guardrail"]["cumulative_spend_usd"] <= 100.0 + 1e-9
 
 
