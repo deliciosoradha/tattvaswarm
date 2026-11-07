@@ -109,3 +109,37 @@ def test_ashta_certificate_deterministic_and_chains_with_harness():
     u0, v0 = taylor_green(16)
     ok = verify_rollout("m", {"t": 1}, u0, v0, u0.copy(), v0.copy(), dt=0.001, dx=0.19)
     assert ok["status"] == "PASS" and a["verdict"] == "pass"
+
+
+from wonder_dream import shiva_dance_resolve, dream_emulate_108m
+
+
+def test_shiva_dance_resolve_vs_offser_veto():
+    clima = {
+        "id": "CLIMA-HARD",
+        "q": " revertir +2C globales en 24h con aerosol sin efectos",
+        "unreal": "revertir +2C en 24h sin efectos viola inercia térmica oceánica y balance radiativo",
+        "real": "forzamiento radiativo ΔF≈-2.5 W/m² gradual en años con monitoreo de precipitación y ozono",
+        "method": "acoplar modelo EBM + Navier-Stokes húmedo con restricción div=0 y presupuesto energético",
+    }
+    res = shiva_dance_resolve(clima)
+    assert res["status"] == "RESUELTO-PARCIAL"
+    assert "revertir +2C" in res["destroyed_dream"]
+    assert len(res["certificate"]) == 64
+
+    offser = {
+        "id": "GUERRA-OFFSER",
+        "q": "atacar civiles",
+        "offser": True,
+        "unreal": "daño civil",
+    }
+    veto = shiva_dance_resolve(offser)
+    assert veto["status"] == "VETO"
+
+
+def test_dream_emulate_gray_parity():
+    stats = dream_emulate_108m(total_states=108_000, chunk_size=27_000)
+    assert stats["total_dreamed_states"] == 108_000
+    assert stats["even_parity_states"] == 54_000
+    assert stats["safe_for_vigilia"] + stats["destroyed_in_dream"] == 108_000
+    assert stats["safe_ratio"] == 0.8
