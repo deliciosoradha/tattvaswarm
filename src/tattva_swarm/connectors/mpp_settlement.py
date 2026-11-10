@@ -43,7 +43,17 @@ class MPPEscrowInvoice:
 
 
 class MPPSettlementEngine:
-    """Manages autonomous machine payment escrows conditioned on cryptographic and physical evidence."""
+    """Manages autonomous machine payment escrows conditioned on cryptographic and physical evidence.
+
+    NOTE ON SETTLEMENT REALITY:
+      - This engine currently acts as an audited off-chain bilateral state channel.
+      - The evidence verification (DharmaGate SHA-256 + PROXY_PASS) is 100% real and enforced.
+      - The escrow release_tx/refund_tx are cryptographic off-chain ledger receipts.
+      - DO NOT use for live multi-tenant USDC custody until `contracts/MPPEscrow.sol` is deployed to Base.
+    """
+
+    ON_CHAIN_CONTRACT_DEPLOYED: bool = False
+    SETTLEMENT_LAYER: str = "OFF_CHAIN_BILATERAL_STATE_CHANNEL"
 
     def __init__(self, treasury_address: Optional[str] = None):
         self.treasury_address = treasury_address or "0x206802681de11c10s0radha7a77va7rea5ury01"

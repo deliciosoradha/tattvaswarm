@@ -25,7 +25,8 @@ REQUIRED_NEW_FILES = [
 ]
 
 CANONICAL_METRICS_NOTE = (
-    "Métricas canónicas verificadas en hardware NVIDIA RTX PRO 6000 Blackwell (sm_120): "
+    "[REFERENCIA ESTÁTICA HACKATHON — NO AUDITADA DINÁMICAMENTE EN ESTE HOST]: "
+    "Métricas canónicas documentadas en paper Meta Muse (hardware NVIDIA RTX PRO 6000 sm_120): "
     "Earth-2 44.01x speedup (0.8597 ms vs 37.84 ms, 1,449.14 GB/s, 40 regs, 0 spills), "
     "100B nodos Q_36 en 140.65 s, Taylor-Green 2,967.03 GB/s, Mach 15 2,564.91 GB/s, "
     "DeFi Sentinel 1,546.39 GB/s."

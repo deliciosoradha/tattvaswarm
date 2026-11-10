@@ -78,19 +78,59 @@ def test_x402_gateway_challenges_and_verification():
     assert ok is False
     assert "Missing" in err
 
-    # 5. Payment verification: simulated / test token
+    # 5. Payment verification: simulated / test token (only accepted with warning)
     auth_val = f"x402 tx=0x_sim_abc123:challenge={quote.challenge_id}"
     ok_sim, _, meta = gateway.verify_payment_header(auth_val, expected_challenge_id=quote.challenge_id)
     assert ok_sim is True
     assert meta["verified"] is True
     assert meta["mode"] == "simulated"
+    assert "warning" in meta
 
-    # 6. Payment verification: on-chain EVM tx hash
-    valid_tx = "0x" + "a" * 64
-    auth_onchain = f"x402 tx={valid_tx}:challenge={quote.challenge_id}"
-    ok_chain, _, meta_chain = gateway.verify_payment_header(auth_onchain, expected_challenge_id=quote.challenge_id)
-    assert ok_chain is True
-    assert meta_chain["mode"] == "on_chain"
+    # 6. Payment verification: fake 66-char EVM hash MUST BE REJECTED by real Base RPC!
+    fake_tx = "0x" + "a" * 64
+    auth_fake = f"x402 tx={fake_tx}:challenge={quote.challenge_id}"
+    ok_fake, err_fake, _ = gateway.verify_payment_header(auth_fake, expected_challenge_id=quote.challenge_id)
+    assert ok_fake is False
+    assert "not found on Base blockchain" in err_fake
+
+    # 7. Payment verification: valid Base JSON-RPC receipt with matching USDC Transfer log
+    valid_addr = "0x2068026810000000000000000000000000000001"
+    gateway.treasury_address = valid_addr
+    quote.recipient = valid_addr
+
+    mock_receipt = {
+        "status": "0x1",
+        "blockNumber": "0x352cf8b",
+        "gasUsed": "0x5208",
+        "logs": [
+            {
+                "address": gateway.BASE_USDC_CONTRACT,
+                "topics": [
+                    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                    "0x0000000000000000000000001111111111111111111111111111111111111111",
+                    "0x000000000000000000000000" + valid_addr[2:].lower(),
+                ],
+                "data": hex(int(quote.amount_usdc * 1e6)),
+                "logIndex": "0x1",
+            }
+        ],
+    }
+
+    # Intercept rpc call by monkeypatching or testing internal method
+    import unittest.mock as mock
+    with mock.patch("urllib.request.urlopen") as mock_url:
+        mock_resp = mock.MagicMock()
+        mock_resp.read.return_value = json.dumps({"jsonrpc": "2.0", "result": mock_receipt}).encode()
+        mock_url.return_value.__enter__.return_value = mock_resp
+
+        ok_valid, msg_valid, meta_valid = gateway.verify_payment_header(
+            f"x402 tx={'0x' + 'b'*64}:challenge={quote.challenge_id}",
+            expected_challenge_id=quote.challenge_id,
+        )
+        assert ok_valid is True
+        assert meta_valid["mode"] == "on_chain_confirmed"
+        assert meta_valid["amount_usdc"] == quote.amount_usdc
+        assert meta_valid["recipient"] == valid_addr.lower()
 
 
 def test_mpp_settlement_engine_release_and_refund():

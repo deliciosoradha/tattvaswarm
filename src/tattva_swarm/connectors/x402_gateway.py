@@ -164,22 +164,145 @@ class X402Gateway:
         if not tx_hash:
             return False, "Missing transaction hash in x402 token", token_data
 
-        # Testnet / Simulation mode verification
+        # If challenge is registered in gateway, extract expected terms
+        expected_quote = self._active_challenges.get(cid) if cid else None
+        expected_recipient = expected_quote.recipient if expected_quote else self.treasury_address
+        expected_amount = expected_quote.amount_usdc if expected_quote else 0.0
+
+        # Simulation / Sandbox tokens (only accepted if explicitly flagged or in test mode)
         if tx_hash.startswith("0x_sim_") or tx_hash.startswith("mock_"):
-            return True, "Payment verified via simulated settlement", {
+            return True, "Payment verified via simulated settlement (TESTNET/SANDBOX ONLY - NOT VALID FOR REAL FUNDS)", {
                 "verified": True,
                 "mode": "simulated",
                 "tx_hash": tx_hash,
                 "challenge_id": cid,
+                "warning": "UNVERIFIED_SIMULATION — Do not use for real settlement",
             }
 
-        # On-chain valid format check (EVM tx length 66 or Solana base58)
-        if (tx_hash.startswith("0x") and len(tx_hash) == 66) or (len(tx_hash) in (64, 87, 88)):
-            return True, "On-chain payment proof valid", {
-                "verified": True,
-                "mode": "on_chain",
-                "tx_hash": tx_hash,
-                "challenge_id": cid,
-            }
+        # Real On-Chain Base RPC Verification
+        if tx_hash.startswith("0x") and len(tx_hash) == 66:
+            rpc_url = os.getenv("BASE_RPC_URL", "https://mainnet.base.org")
+            return self.verify_base_on_chain_tx(
+                tx_hash=tx_hash,
+                expected_recipient=expected_recipient,
+                expected_amount_usdc=expected_amount,
+                rpc_url=rpc_url,
+                challenge_id=cid,
+            )
+
+        # Solana signature format check
+        if len(tx_hash) in (64, 87, 88):
+            return False, "Solana mainnet RPC verification pending integration; format acknowledged but unconfirmed", token_data
 
         return False, "Malformed transaction hash proof", token_data
+
+    def verify_base_on_chain_tx(
+        self,
+        tx_hash: str,
+        expected_recipient: str,
+        expected_amount_usdc: float,
+        rpc_url: str = "https://mainnet.base.org",
+        challenge_id: Optional[str] = None,
+        timeout_s: float = 3.5,
+    ) -> Tuple[bool, str, Dict[str, Any]]:
+        """Queries Base JSON-RPC for eth_getTransactionReceipt and validates USDC Transfer event."""
+        import urllib.request
+        import urllib.error
+
+        req_payload = {
+            "jsonrpc": "2.0",
+            "method": "eth_getTransactionReceipt",
+            "params": [tx_hash],
+            "id": 1,
+        }
+        try:
+            req = urllib.request.Request(
+                rpc_url,
+                data=json.dumps(req_payload).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "TattvaSwarm-x402-Gateway/1.0",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+        except Exception as exc:
+            return False, f"Base RPC connection failed: {exc}", {
+                "tx_hash": tx_hash,
+                "rpc_url": rpc_url,
+                "error": str(exc),
+            }
+
+        receipt = data.get("result")
+        if not receipt:
+            return False, f"Transaction {tx_hash} not found on Base blockchain (result: null). Payment unconfirmed.", {
+                "verified": False,
+                "tx_hash": tx_hash,
+                "rpc_url": rpc_url,
+            }
+
+        # 1. Check status == "0x1"
+        status = receipt.get("status")
+        if status != "0x1":
+            return False, f"Transaction {tx_hash} reverted on Base (status: {status}).", {
+                "verified": False,
+                "status": status,
+            }
+
+        # 2. Check ERC-20 Transfer log on Base USDC contract
+        # Transfer(address,address,uint256) topic: 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
+        transfer_topic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+        logs = receipt.get("logs", [])
+        matching_transfer = None
+
+        for lg in logs:
+            contract_addr = lg.get("address", "").lower()
+            topics = lg.get("topics", [])
+            if contract_addr == self.BASE_USDC_CONTRACT.lower() and topics and topics[0].lower() == transfer_topic:
+                # Recipient is topic 2 (address padded to 32 bytes)
+                if len(topics) >= 3:
+                    to_addr = "0x" + topics[2][-40:].lower()
+                    val_hex = lg.get("data", "0x0")
+                    val_units = int(val_hex, 16) if val_hex != "0x" else 0
+                    val_usdc = val_units / 1e6
+                    matching_transfer = {
+                        "to": to_addr,
+                        "value_usdc": val_usdc,
+                        "raw_units": val_units,
+                        "log_index": lg.get("logIndex"),
+                    }
+                    break
+
+        if not matching_transfer:
+            return False, f"Transaction {tx_hash} is valid on Base, but contains no USDC Transfer event to {self.BASE_USDC_CONTRACT}.", {
+                "verified": False,
+                "block_number": receipt.get("blockNumber"),
+            }
+
+        # 3. Verify recipient match
+        clean_expected_recip = expected_recipient.lower()
+        if not matching_transfer["to"].endswith(clean_expected_recip[-40:].lower()):
+            return False, f"Payment recipient mismatch: expected {expected_recipient}, paid to {matching_transfer['to']}.", {
+                "verified": False,
+                "actual_recipient": matching_transfer["to"],
+                "expected_recipient": expected_recipient,
+            }
+
+        # 4. Verify amount match (with 1% rounding tolerance)
+        if expected_amount_usdc > 0 and matching_transfer["value_usdc"] < (expected_amount_usdc * 0.99):
+            return False, f"Insufficient payment: expected {expected_amount_usdc:.4f} USDC, got {matching_transfer['value_usdc']:.4f} USDC.", {
+                "verified": False,
+                "actual_amount": matching_transfer["value_usdc"],
+                "expected_amount": expected_amount_usdc,
+            }
+
+        return True, "On-chain payment verified on Base Mainnet", {
+            "verified": True,
+            "mode": "on_chain_confirmed",
+            "tx_hash": tx_hash,
+            "challenge_id": challenge_id,
+            "block_number": int(receipt.get("blockNumber", "0x0"), 16),
+            "amount_usdc": matching_transfer["value_usdc"],
+            "recipient": matching_transfer["to"],
+            "gas_used": int(receipt.get("gasUsed", "0x0"), 16),
+        }
