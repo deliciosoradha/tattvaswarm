@@ -12,7 +12,8 @@ import hashlib, re
 from typing import Dict
 
 _SECRET = re.compile(r"(?i)(api[_-]?key|bearer|token|secret|password)\s*[:=]\s*\S+")
-_KEYLIKE = re.compile(r"\b(sk-[A-Za-z0-9\-_]{8,}|[A-Za-z0-9_\-]{32,})\b")
+_UUID_PAT = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+_KEYLIKE = re.compile(rf"\b(sk-[A-Za-z0-9\-_]{{8,}}|(?!(?:{_UUID_PAT})\b)[A-Za-z0-9_\-]{{32,}})\b")
 
 
 def redact(text: str) -> str:

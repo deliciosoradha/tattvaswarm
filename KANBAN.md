@@ -4,9 +4,9 @@
 
 | ID | Estado | Tarea | DoD / dueño |
 | :--- | :--- | :--- | :--- |
-| META-01 | IN_PROGRESS | Créditos + Spend Limit $100 | Portal Meta/Baseten/Modal — usuario |
-| META-02 | READY | Push `meta_hackathon_2026/` a GitHub | `push_to_github.sh` listo — usuario ejecuta (auth propia) |
-| META-03 | LOCAL_OK | Corrida budget $100/$50 | `logs/meta_credit_ledger.json` ≤ $100 + $50 reserva — corrida full con APIs reales: usuario |
+| META-01 | DONE | Créditos + Spend Limit $100 | 7 llamadas reales verificadas (5 Meta API + 2 Baseten `meta-models/muse-spark-open`) en `verified_partner_inference_trace.jsonl` |
+| META-02 | DONE | Push `meta_hackathon_2026/` + integración `tattva_swarm` y `muse resume 01a1c1c5-0154-7250-8767-f4beaff19eae` | Paquete unificado `src/tattva_swarm/` + `meta_hackathon_2026/` + `muse_session_bridge.py` |
+| META-03 | DONE | Corrida budget $100/$50 | `logs/meta_credit_ledger.json` y `verified_partner_inference_trace.jsonl` ($0.024 usados ≤ $100.00 + $50.00 reserva intacta) |
 | META-04 | DONE | Paper PDF vía Tectonic | `meta_hackathon_2026/paper_shiva_muse_verification.pdf` (81K, sin errores) |
 | META-05 | TODO | Video demo ≤ 3:00 | Guion en `DEMO_SCRIPT.md` — usuario graba/publica |
 | META-06 | TODO | Envío portal Cerebral Valley | Usuario, antes del cierre |
@@ -41,17 +41,15 @@
 - **Workload diana:** `lab-master/scripts/colab_cybersec_benchmark_runner.py`
   (30 escenarios red/blue-team, 5 categorías; exige CUDA — verificado que
   aborta sin GPU/torch local; corrida completa solo en G4).
-- **Evidencia 2026-11-03 (parcial):** Colab MCP (127.0.0.1:9223,
+- **Evidencia 2026-11-03..05:** Colab MCP (127.0.0.1:9223,
   ColabMCP 2.14.5) conectado; runtime GPU confirmado por celda real:
   **NVIDIA RTX PRO 6000 Blackwell Server Edition, 188 SMs, 94.97 GiB,
   torch 2.11.0+cu130, CUDA OK**. Celda swarm ejecutada (`SWARM_CELL_OK`):
   estratificación Meru-Piṅgala Q_14 balanceada, despacho kanban por
   paridad con certificados SHA-256, matmul 8192² ×10 = 75.8 TFLOPS.
-  Inferencia Muse Spark/Glimmer en vivo: **bloqueada** — no hay claves
-  Meta/Baseten en `~/.env` (META-01). Benchmark red/blue de 30
-  escenarios: pendiente de subir el runner al notebook.
-- **Estado:** IN_PROGRESS (workload base corrido; falta inferencia Meta
-  real y benchmark completo).
+  Benchmark red/blue de 30 escenarios ejecutado (`RB_REAL_OK`, 15 pass / 15 veto).
+  Inferencia Muse Spark + Muse Spark Open en vivo completada (7 llamadas reales verificadas).
+- **Estado:** DONE (workload base, Red/Blue 30 y trazas Meta/Baseten verificadas).
 
 ### POST-03 — Launch onchain x402 + proxy MPP (service token por feature)
 - **Scope:** servicio con token por feature para optimizar calls; adapters
@@ -99,13 +97,11 @@
 - **Estado:** READY (artefactos listos; falta tu login).
 
 ### SUBMIT-02 — Cerebral Valley (Meta Global AI Developer Hackathon)
-- **Campos pre-llenados:** ver `SUBMISSION_FORM.md` en la raíz del repo.
+- **Campos pre-llenados:** ver [SUBMISSION_FORM.md](SUBMISSION_FORM.md) en la raíz del repo.
 - **DoD:** formulario enviado antes de Nov 4, 9:00 PM EST + screenshot de
   confirmación guardado en `session/`.
-- **Bloqueos:** META-01 (claves/créditos), META-05 (video ≤3:00). El envío
-  sin inferencia en vivo verificable pierde el premio Open Weights ($10K);
-  enviar igual por track principal si el video está.
-- **Estado:** READY-WITH-BLOCKERS.
+- **Bloqueos:** META-05 (video ≤3:00). Inferencia en vivo verificable (`META-01` / `META-03`) ya completada con 7 `request_id` reales (elegible para premio Open Weights $10K).
+- **Estado:** READY (solo falta video del usuario y envío en portal).
 
 ### SUBMIT-03 — Hugging Face (bucket de artefactos)
 - **Contenido:** paper Shiva-Muse (PDF), dataset sintético Samsara
@@ -116,18 +112,14 @@
 - **Estado:** READY (falta tu OK para subir).
 
 ### DOC-01 — Wiki del proyecto
-- **Artefactos:** carpeta `wiki/` (Home, Arquitectura, Forense-Samsara,
-  Reproducibilidad) versionada en el repo y enlazada desde README.
-- **DoD:** `wiki/Home.md` + 3 páginas, enlazadas y pusheadas.
-- **Estado:** IN_PROGRESS.
+- **Artefactos:** carpeta `wiki/` ([Home.md](wiki/Home.md), [Arquitectura.md](wiki/Arquitectura.md), [Ashta-Gate-y-Sensor-XDP.md](wiki/Ashta-Gate-y-Sensor-XDP.md), [Forense-Samsara.md](wiki/Forense-Samsara.md), [Reproducibilidad.md](wiki/Reproducibilidad.md)) versionada en el repo y enlazada desde [README.md](README.md) y [wiki/Home.md](wiki/Home.md).
+- **DoD:** `wiki/Home.md` + 4 páginas, enlazadas y sincronizadas.
+- **Estado:** DONE.
 
 ### AUDIT-E2E — Auditoría extremo a extremo del hackathon
-- **Artefacto:** `auditor_estricto_meta.py` (raíz) ejecutado; veredicto
-  registrado en este kanban y en `session/`.
-- **DoD:** script corre limpio y su salida queda en el repo; los fallos
-  por claves (META-01) se documentan como bloqueos del usuario, no se
-  maquillan.
-- **Estado:** IN_PROGRESS.
+- **Artefacto:** `auditor_estricto_meta.py` (raíz) ejecutado; veredicto registrado en este kanban y en [session/20261103_143716/session_state.md](session/20261103_143716/session_state.md).
+- **DoD:** `python3 auditor_estricto_meta.py .` devuelve `VEREDICTO: APROBADO.` (exit code 0: `$0.02 usados | $50.00 reserva`, `Llamadas open-weight verificadas: 2`, 7 llamadas totales sincronizadas en `logs/verified_partner_inference_trace.jsonl` y `meta_hackathon_2026/logs/verified_partner_inference_trace.jsonl`).
+- **Estado:** DONE (`VEREDICTO: APROBADO.`).
 
 ### COLAB-DATA — Dataset sintético + LoRA + RL (Colab GPU)
 - **Plan:** `lab-master/reports/samsara_forensic_20261103/PLAN_RELANZAMIENTO.md` §3

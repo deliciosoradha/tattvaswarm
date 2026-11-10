@@ -6,3 +6,5 @@ logs/*.npz
 logs/**/*.npz
 *.aux
 *.log
+.venv/
+*.egg-info/

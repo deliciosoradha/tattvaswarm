@@ -102,6 +102,18 @@ def shiva_dance_resolve(claim: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _popcount_u32(arr: Any) -> Any:
+    """NumPy 1.x and 2.x compatible vectorized population count for uint32 arrays."""
+    import numpy as np
+    if hasattr(np, "bitwise_count"):
+        return np.bitwise_count(arr)
+    x = arr.astype(np.uint32, copy=True)
+    x = x - ((x >> np.uint32(1)) & np.uint32(0x55555555))
+    x = (x & np.uint32(0x33333333)) + ((x >> np.uint32(2)) & np.uint32(0x33333333))
+    x = (x + (x >> np.uint32(4))) & np.uint32(0x0F0F0F0F)
+    return ((x * np.uint32(0x01010101)) >> np.uint32(24)).astype(np.uint8)
+
+
 def dream_emulate_108m(total_states: int = 108_000_000, chunk_size: int = 27_000_000) -> Dict[str, Any]:
     """
     Emulación controlada en el sueño (Dream) de 108,000,000 de estados posibles
@@ -119,7 +131,7 @@ def dream_emulate_108m(total_states: int = 108_000_000, chunk_size: int = 27_000
     for c in range(chunks):
         idx = np.arange(c * n_per_chunk, (c + 1) * n_per_chunk, dtype=np.uint32)
         gray = idx ^ (idx >> np.uint32(1))
-        parity = np.bitwise_count(gray) & np.uint8(1)
+        parity = _popcount_u32(gray) & np.uint8(1)
         ok = ((parity == 0) | (parity == 1)) & ((idx % 5) != 0)
         safe += int(ok.sum())
         even += int((parity == 0).sum())

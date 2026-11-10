@@ -29,7 +29,10 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-from verifiable_agent_harness import certificate_hash
+try:
+    from meta_hackathon_2026.verifiable_agent_harness import certificate_hash
+except ImportError:  # pragma: no cover
+    from verifiable_agent_harness import certificate_hash  # type: ignore
 
 ASPECTS = ["prithvi", "jala", "agni", "vayu", "akasha", "manas", "buddhi", "ahamkara"]
 HARD_ASPECTS = ("prithvi", "agni")

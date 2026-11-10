@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tattva-swarm"
+version = "0.1.0"
+description = "Sovereign personal AI swarm: tiered Nemotron routing on Nebius Token Factory, persistent local memory, and compact logical worker swarms. Local-first: your data never leaves the machine."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [{ name = "TattvaSwarm contributors" }]
+keywords = ["ai-agents", "swarm", "local-first", "nebius", "nemotron", "sovereign-ai"]
+# Zero required runtime dependencies: the core is stdlib-only by design.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+# Optional adapters — the core stays zero-dependency without these.
+langchain = ["langchain-core>=0.3"]
+
+[project.scripts]
+tattva = "tattva_swarm.cli:main"
+tattva-mcp = "tattva_swarm.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["src", "."]
+include = ["tattva_swarm*", "meta_hackathon_2026*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", ".", "meta_hackathon_2026"]

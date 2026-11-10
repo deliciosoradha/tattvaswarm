@@ -1,0 +1,30 @@
+{
+  "session_id": "01a1c1c5-0154-7250-8767-f4beaff19eae",
+  "uuidv7_metadata": {
+    "session_id": "01a1c1c5-0154-7250-8767-f4beaff19eae",
+    "version": 7,
+    "is_uuidv7": true,
+    "unix_ts_ms": 1794252276052,
+    "timestamp_ms": 1794252276052,
+    "timestamp_utc": "2026-11-09T19:24:36.052Z",
+    "iso_utc": "2026-11-09T19:24:36.052Z",
+    "timestamp_iso": "2026-11-09T19:24:36.052Z",
+    "prefix_family": "01a1",
+    "rand_a": 592,
+    "rand_b_hex": "0767f4beaff19eae"
+  },
+  "cli_command": "muse resume 01a1c1c5-0154-7250-8767-f4beaff19eae",
+  "headless_command": "muse exec --session-id 01a1c1c5-0154-7250-8767-f4beaff19eae",
+  "export_command": "muse export --session 01a1c1c5-0154-7250-8767-f4beaff19eae --out trajectory.json",
+  "status": "RESUMED_CHECKPOINT",
+  "verified_trace_count": 7,
+  "meta_api_calls": 5,
+  "baseten_open_weight_calls": 2,
+  "budget_guardrail": {
+    "cumulative_meta_spend_usd": 0.024,
+    "untouched_reserve_usd": 50.0,
+    "hard_spend_cap_usd": 100.0
+  },
+  "pipeline_certificate": "eb593052f13e25913ec099bd81bb735cafdab628bfdafef0615321a571404871",
+  "trajectory_sha256": "faccf226c1ec39572080b66405681fe088aad6ad4fb7e259aad0bb172e1b0225"
+}

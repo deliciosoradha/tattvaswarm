@@ -1,0 +1,270 @@
+"""TattvaSwarm CLI — `tattva <command>`.
+
+Commands:
+  tattva doctor                          env + backend health check (honest, never fakes OK)
+  tattva route "prompt" [--tier T]       route one prompt through the tiered router
+  tattva memory add|search|recent|count  local persistent memory
+  tattva swarm run tasks.json            parallel -> verify -> synthesize (conductor)
+  tattva code run "cmd"                  run one command in the hardened sandbox
+  tattva mcp                             serve MCP tools over stdio
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+from . import __version__
+from .nebius import BackendError, TokenFactoryClient, load_env_file, tattva_home
+from .router import EXTENDED_TIERS, TIERS, route, tier_models
+
+
+def cmd_doctor(_args: argparse.Namespace) -> int:
+    load_env_file()
+    print(f"TattvaSwarm {__version__} — doctor")
+    key = os.environ.get("NEBIUS_API_KEY", "").strip()
+    base = os.environ.get("NEBIUS_BASE_URL", "").strip() or "(default)"
+    print(f"  NEBIUS_API_KEY: {'set (len=%d)' % len(key) if key else 'MISSING — get one at https://tokenfactory.nebius.com/'}")
+    print(f"  NEBIUS_BASE_URL: {base}")
+    for tier, model in tier_models().items():
+        print(f"  tier {tier:<9}: {model or 'MISSING (set TATTVA_MODEL_* in .env)'}")
+    print(f"  TATTVA_HOME: {tattva_home()}")
+    tavily = "set" if os.environ.get("TAVILY_API_KEY", "").strip() else "not set (research tier disabled)"
+    print(f"  TAVILY_API_KEY: {tavily}")
+    try:
+        from .muse_bridge import MuseSwarmAdapter
+
+        muse_stat = MuseSwarmAdapter().status_snapshot()
+        print(f"  SHIVA_MUSE: enabled (default_session={muse_stat['default_session_id']})")
+    except Exception:
+        pass
+    if not key:
+        print("  backend: SKIPPED (no key) — honest state, nothing was fabricated")
+        return 2
+    try:
+        models = TokenFactoryClient().list_models()
+        nvidia = [m for m in models if "nemotron" in m.lower() or m.lower().startswith("nvidia/")]
+        print(f"  backend: OK — {len(models)} models visible, {len(nvidia)} nvidia/nemotron")
+        return 0
+    except BackendError as exc:
+        print(f"  backend: FAIL — {exc}")
+        return 1
+
+
+def cmd_route(args: argparse.Namespace) -> int:
+    out = route(
+        args.prompt,
+        tier=args.tier,
+        provider=getattr(args, "provider", "auto"),
+    )
+    print(json.dumps(out, indent=2, ensure_ascii=False, default=str))
+    return 0 if out.get("status") == "ok" else 3
+
+
+def cmd_muse(args: argparse.Namespace) -> int:
+    import tempfile
+    from .muse_bridge import DEFAULT_MUSE_SESSION_ID, MuseSwarmAdapter
+
+    with tempfile.TemporaryDirectory() as td:
+        adapter = MuseSwarmAdapter(ledger_path=os.path.join(td, "cli_ledger.json"))
+        subcmd = getattr(args, "muse_cmd", None) or "resume"
+        if subcmd == "route":
+            out = adapter.route_with_muse(
+                args.prompt,
+                task_id=args.task_id,
+                modality=args.modality,
+                execute_live=args.live,
+            )
+        elif subcmd == "pipeline":
+            out = adapter.run_full_pipeline(
+                args.prompt,
+                agent_id=args.agent_id,
+                task_type=args.task_type,
+                execute_live=args.live,
+            )
+        elif subcmd == "resume":
+            out = adapter.resume_muse_session(
+                session_id=getattr(args, "session_id", None) or DEFAULT_MUSE_SESSION_ID,
+                prompt=getattr(args, "prompt", None),
+                execute_live=getattr(args, "live", False),
+            )
+        elif subcmd == "dream":
+            out = adapter.wonder_manifest(args.question, n=args.candidates)
+        elif subcmd == "gate":
+            trace = json.loads(args.trace_json)
+            out = adapter.evaluate_ashta_gate(trace)
+        else:
+            print(f"unknown muse command {subcmd!r}", file=sys.stderr)
+            return 2
+    print(json.dumps(out, indent=2, ensure_ascii=False, default=str))
+    return 0
+
+
+def cmd_memory(args: argparse.Namespace) -> int:
+    from .memory import Memory
+
+    mem = Memory()
+    try:
+        if args.mem_cmd == "add":
+            entry_id = mem.add(" ".join(args.text), kind=args.kind, tags=args.tags)
+            print(f"added entry #{entry_id} (local only)")
+            return 0
+        if args.mem_cmd == "search":
+            rows = mem.search(" ".join(args.query), limit=args.limit)
+            if not rows:
+                print("(no matches)")
+                return 0
+            for r in rows:
+                print(f"#{r['id']} [{r['kind']}] {r['created_at']}  {r['text'][:140]}")
+            return 0
+        if args.mem_cmd == "recent":
+            for r in mem.recent(limit=args.limit):
+                print(f"#{r['id']} [{r['kind']}] {r['created_at']}  {r['text'][:140]}")
+            return 0
+        if args.mem_cmd == "count":
+            print(f"{mem.count()} entries in {mem.path}")
+            return 0
+        print(f"unknown memory command {args.mem_cmd!r}", file=sys.stderr)
+        return 2
+    finally:
+        mem.close()
+
+
+def cmd_swarm(args: argparse.Namespace) -> int:
+    from .conductor import run_graph
+
+    spec = json.loads(open(args.spec, encoding="utf-8").read())
+    out = run_graph(spec)
+    print(json.dumps(out, indent=2, ensure_ascii=False))
+    return 0 if all(r.get("status") == "ok" for r in out.get("results", [])) else 3
+
+
+def cmd_code(args: argparse.Namespace) -> int:
+    from .sandbox import CodeEngineError, run_code
+
+    try:
+        result = run_code(
+            args.cmd,
+            image=args.image,
+            timeout_s=args.timeout,
+            allow_network=args.allow_network,
+            workdir=args.workdir,
+        )
+    except CodeEngineError as exc:
+        print(f"code engine unavailable: {exc}", file=sys.stderr)
+        return 2
+    if args.json:
+        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+    else:
+        print(result.stdout, end="")
+        if result.stderr:
+            print(result.stderr, end="", file=sys.stderr)
+        print(
+            f"[code-engine] backend={result.backend} exit={result.exit_code} "
+            f"timed_out={result.timed_out} wall={result.wall_s}s",
+            file=sys.stderr,
+        )
+    return result.exit_code if result.exit_code >= 0 else 1
+
+
+def cmd_mcp(_args: argparse.Namespace) -> int:
+    from .mcp_server import main as mcp_main
+
+    return mcp_main()
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="tattva", description=f"TattvaSwarm {__version__} — sovereign personal AI swarm")
+    parser.add_argument("--version", action="version", version=__version__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p_doctor = sub.add_parser("doctor", help="env + backend health check")
+    p_doctor.set_defaults(func=cmd_doctor)
+
+    p_route = sub.add_parser("route", help="route one prompt through the tiered router")
+    p_route.add_argument("prompt")
+    p_route.add_argument("--tier", choices=("auto", *EXTENDED_TIERS), default="auto")
+    p_route.add_argument("--provider", choices=("auto", "nebius", "muse"), default="auto")
+    p_route.set_defaults(func=cmd_route)
+
+    p_muse = sub.add_parser("muse", help="Shiva-Muse verifiable router, pipeline, and session bridge")
+    muse_sub = p_muse.add_subparsers(dest="muse_cmd", required=True)
+
+    m_route = muse_sub.add_parser("route", help="route prompt via ShivaMuseRouter")
+    m_route.add_argument("prompt")
+    m_route.add_argument("--modality", default="reasoning")
+    m_route.add_argument("--task-id", type=int, default=0)
+    m_route.add_argument("--live", action="store_true")
+
+    m_pipe = muse_sub.add_parser("pipeline", help="run 8-stage Shiva-Muse verification pipeline")
+    m_pipe.add_argument("prompt")
+    m_pipe.add_argument("--task-type", default="reasoning")
+    m_pipe.add_argument("--agent-id", type=int, default=0)
+    m_pipe.add_argument("--live", action="store_true")
+
+    m_resume = muse_sub.add_parser("resume", help="resume Meta Muse CLI UUIDv7 session")
+    m_resume.add_argument("session_id", nargs="?", default="01a1c1c5-0154-7250-8767-f4beaff19eae")
+    m_resume.add_argument("--prompt", default=None)
+    m_resume.add_argument("--live", action="store_true")
+
+    m_dream = muse_sub.add_parser("dream", help="manifest verified candidates via Wonder Dream")
+    m_dream.add_argument("question")
+    m_dream.add_argument("--candidates", type=int, default=4)
+
+    m_gate = muse_sub.add_parser("gate", help="evaluate trace JSON with Ashta-Gate")
+    m_gate.add_argument("trace_json")
+    p_muse.set_defaults(func=cmd_muse)
+
+    p_resume = sub.add_parser("resume", help="resume Meta Muse CLI UUIDv7 session directly")
+    p_resume.add_argument("session_id", nargs="?", default="01a1c1c5-0154-7250-8767-f4beaff19eae")
+    p_resume.add_argument("--prompt", default=None)
+    p_resume.add_argument("--live", action="store_true")
+    p_resume.set_defaults(func=cmd_muse, muse_cmd="resume")
+
+    p_mem = sub.add_parser("memory", help="local persistent memory")
+    mem_sub = p_mem.add_subparsers(dest="mem_cmd", required=True)
+    m_add = mem_sub.add_parser("add")
+    m_add.add_argument("text", nargs="+")
+    m_add.add_argument("--kind", default="note")
+    m_add.add_argument("--tags", nargs="*", default=None)
+    m_search = mem_sub.add_parser("search")
+    m_search.add_argument("query", nargs="+")
+    m_search.add_argument("--limit", type=int, default=5)
+    m_recent = mem_sub.add_parser("recent")
+    m_recent.add_argument("--limit", type=int, default=10)
+    mem_sub.add_parser("count")
+    p_mem.set_defaults(func=cmd_memory)
+
+    p_swarm = sub.add_parser("swarm", help="run a task graph (parallel -> verify -> synthesize)")
+    swarm_sub = p_swarm.add_subparsers(dest="swarm_cmd", required=True)
+    s_run = swarm_sub.add_parser("run")
+    s_run.add_argument("spec", help="path to a tasks.json spec")
+    p_swarm.set_defaults(func=cmd_swarm)
+
+    p_code = sub.add_parser("code", help="run code in the hardened sandbox (code engine)")
+    code_sub = p_code.add_subparsers(dest="code_cmd", required=True)
+    c_run = code_sub.add_parser("run")
+    c_run.add_argument("cmd", help="shell command to run inside the sandbox")
+    c_run.add_argument("--image", default=None, help="container image (default python:3.12-slim)")
+    c_run.add_argument("--timeout", type=float, default=30.0, help="wall-clock seconds")
+    c_run.add_argument("--allow-network", action="store_true", help="enable network (off by default)")
+    c_run.add_argument("--workdir", default=None, help="host dir mounted at /work")
+    c_run.add_argument("--json", action="store_true")
+    p_code.set_defaults(func=cmd_code)
+
+    p_mcp = sub.add_parser("mcp", help="serve MCP tools over stdio (wait for a client)")
+    p_mcp.set_defaults(func=cmd_mcp)
+
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return int(args.func(args))
+
+
+if __name__ == "__main__":
+    sys.exit(main())
