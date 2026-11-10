@@ -47,6 +47,7 @@
 ## Notas de integración
 
 - Los 5 oráculos y el Evidence Runner están en `hackathon-submit` @ `20c0d25`.
+- **Hallazgo empírico Ashta-Gate vs Oráculos de Dominio**: en pruebas adversarias sobre 50 afirmaciones absurdas bien redactadas, Ashta-Gate tuvo **100% de falso-pase** (valida estructura/léxico, no física). Los oráculos de dominio tuvieron **100% de rechazo**. La defensa real reside en los oráculos de dominio.
 - `agent_harness.py` ejecuta el pipeline completo: el agente produce el candidato y el oráculo califica con tiers estrictos.
 - `adversarial_cases.py` contiene los vetos que Shiva + oráculo rechazan de forma 100% determinista.
 - `liquidity_tasks.py` reutiliza exactamente el mismo `seal()` / `verify()` del Evidence Shield.

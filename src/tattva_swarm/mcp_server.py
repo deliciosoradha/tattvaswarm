@@ -216,6 +216,103 @@ def _tool_code_run(args: dict) -> tuple[dict, bool]:
     return result.to_dict(), False
 
 
+def _tool_frontier_oracle_eval(args: dict) -> tuple[dict, bool]:
+    oracle_name = str(args.get("oracle", "")).lower().strip()
+    task = args.get("task") or {}
+    answer = args.get("answer") or {}
+
+    try:
+        from frontier_eval.oracles import scramjet, tps, lunar_power, rubisco, backtranslate
+        dispatch = {
+            "scramjet": scramjet,
+            "tps": tps,
+            "lunar_power": lunar_power,
+            "rubisco": rubisco,
+            "backtranslate": backtranslate,
+        }
+        if oracle_name not in dispatch:
+            return {"status": "error", "error": f"unknown oracle: {oracle_name!r}. Choices: {list(dispatch.keys())}"}, True
+        res = dispatch[oracle_name].evaluate(task, answer)
+        return {"status": "ok", "oracle": oracle_name, "evaluation": res}, False
+    except Exception as exc:
+        return {"status": "error", "error": str(exc)}, True
+
+
+def _tool_frontier_agent_harness(args: dict) -> tuple[dict, bool]:
+    import pathlib
+    import tempfile
+
+    task_name = str(args.get("task", "tps")).lower().strip()
+    agent_type = str(args.get("agent", "tattva")).lower().strip()
+    evidence_dir_str = args.get("evidence_dir")
+
+    try:
+        from frontier_eval.agent_harness import default_agent, run_pipeline, tattva_agent
+
+        agent_fn = tattva_agent if agent_type == "tattva" else default_agent
+        if evidence_dir_str:
+            evidence_dir = pathlib.Path(evidence_dir_str)
+            res = run_pipeline(task_name, evidence_dir, agent_fn=agent_fn)
+            return {"status": "ok", "result": res}, False
+        else:
+            with tempfile.TemporaryDirectory() as td:
+                res = run_pipeline(task_name, pathlib.Path(td), agent_fn=agent_fn)
+                return {"status": "ok", "result": res}, False
+    except Exception as exc:
+        return {"status": "error", "error": str(exc)}, True
+
+
+def _tool_frontier_evidence_verify(args: dict) -> tuple[dict, bool]:
+    import pathlib
+
+    evidence_dir = str(args.get("evidence_dir", "")).strip()
+    if not evidence_dir:
+        return {"status": "error", "error": "missing required argument: evidence_dir"}, True
+    try:
+        from frontier_eval.agent_harness import verify_manifest
+
+        res = verify_manifest(pathlib.Path(evidence_dir))
+        return {"status": "ok", "verification": res}, False
+    except Exception as exc:
+        return {"status": "error", "error": str(exc)}, True
+
+
+def _tool_colab_bridge_status(args: dict) -> tuple[dict, bool]:
+    import socket
+    import urllib.request
+
+    port = int(args.get("port", 9223))
+    host = str(args.get("host", "127.0.0.1"))
+
+    # Test local port
+    is_open = False
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1.0)
+    try:
+        res = sock.connect_ex((host, port))
+        is_open = (res == 0)
+    except Exception:
+        pass
+    finally:
+        sock.close()
+
+    colab_setup_snippet = (
+        "!git clone https://github.com/deliciosoradha/tattvaswarm.git\n"
+        "%cd tattvaswarm\n"
+        "!pip install uv && uv run --with numpy,pytest pytest tests/ -q\n"
+        "!PYTHONPATH=src:meta_hackathon_2026:. uv run --with numpy python3 -m frontier_eval.agent_harness --task all\n"
+    )
+
+    out = {
+        "status": "ok",
+        "bridge_target": f"{host}:{port}",
+        "bridge_listening": is_open,
+        "colab_ready": True,
+        "setup_snippet": colab_setup_snippet,
+    }
+    return out, False
+
+
 TOOLS: list[dict[str, Any]] = [
     {
         "name": "tattva_status",
@@ -338,6 +435,58 @@ TOOLS: list[dict[str, Any]] = [
             "additionalProperties": False,
         },
     },
+    {
+        "name": "frontier_oracle_eval",
+        "description": "Evaluate an engineering candidate design against first-principles physics/biology oracles (scramjet, tps, lunar_power, rubisco, backtranslate). Never emits 'SOLVED'.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "oracle": {"type": "string", "enum": ["scramjet", "tps", "lunar_power", "rubisco", "backtranslate"]},
+                "task": {"type": "object", "description": "Task constraints and requirements"},
+                "answer": {"type": "object", "description": "Candidate design parameters to evaluate"},
+            },
+            "required": ["oracle", "answer"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "frontier_agent_harness",
+        "description": "Run the complete Frontier Agent Harness: Agent Generates -> Oracle Qualifies -> DharmaGate Evidence Shield Seals (chmod 444 + manifest.sha256).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "task": {"type": "string", "enum": ["scramjet", "tps", "lunar_power", "rubisco", "backtranslate"], "default": "tps"},
+                "agent": {"type": "string", "enum": ["tattva", "default"], "default": "tattva"},
+                "evidence_dir": {"type": "string", "description": "Optional evidence directory path to write sealed bundle"},
+            },
+            "required": ["task"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "frontier_evidence_verify",
+        "description": "Cryptographically verify the integrity of a sealed evidence bundle directory using DharmaGate Evidence Shield.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "evidence_dir": {"type": "string", "description": "Path to evidence bundle directory to verify"},
+            },
+            "required": ["evidence_dir"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "colab_bridge_status",
+        "description": "Inspect the Google Colab integration bridge status and get the ready-to-run Colab setup commands.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "port": {"type": "integer", "default": 9223},
+                "host": {"type": "string", "default": "127.0.0.1"},
+            },
+            "additionalProperties": False,
+        },
+    },
 ]
 
 _HANDLERS: dict[str, Callable[[dict], tuple[dict, bool]]] = {
@@ -350,6 +499,10 @@ _HANDLERS: dict[str, Callable[[dict], tuple[dict, bool]]] = {
     "tattva_memory_search": _tool_memory_search,
     "tattva_swarm_run": _tool_swarm_run,
     "tattva_code_run": _tool_code_run,
+    "frontier_oracle_eval": _tool_frontier_oracle_eval,
+    "frontier_agent_harness": _tool_frontier_agent_harness,
+    "frontier_evidence_verify": _tool_frontier_evidence_verify,
+    "colab_bridge_status": _tool_colab_bridge_status,
 }
 
 # ---------------------------------------------------------------------------

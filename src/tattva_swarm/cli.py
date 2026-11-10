@@ -175,6 +175,98 @@ def cmd_mcp(_args: argparse.Namespace) -> int:
     return mcp_main()
 
 
+def cmd_frontier(args: argparse.Namespace) -> int:
+    subcmd = getattr(args, "frontier_cmd", "harness")
+    if subcmd == "harness":
+        import pathlib
+        from frontier_eval.agent_harness import default_agent, run_pipeline, tattva_agent, ORACLE_DISPATCH
+
+        agent_fn = tattva_agent if args.agent == "tattva" else default_agent
+        evidence_path = pathlib.Path(args.evidence_dir)
+        tasks_to_run = list(ORACLE_DISPATCH.keys()) if args.task == "all" else [args.task]
+
+        print(f"[*] Frontier Agent Harness (Agent: {args.agent})")
+        for tname in tasks_to_run:
+            target_dir = evidence_path / tname if len(tasks_to_run) > 1 else evidence_path
+            res = run_pipeline(tname, target_dir, agent_fn=agent_fn)
+            print(f"[OK] Task `{tname}` -> Tier: {res['tier']} | Sealed at: {res['evidence_dir']}")
+        return 0
+
+    elif subcmd == "verify":
+        import pathlib
+        from frontier_eval.agent_harness import verify_manifest
+
+        target = pathlib.Path(args.evidence_dir)
+        print(f"[*] Verifying evidence directory: {target}")
+        res = verify_manifest(target)
+        print(f"[Result] Verdict: {res.get('verdict')}")
+        for fname, info in res.get("files", {}).items():
+            print(f"  - {fname}: {info.get('status')}")
+        return 0 if res.get("verdict") == "INTEGRITY_OK" else 1
+
+    elif subcmd == "adversarial":
+        from frontier_eval.adversarial_cases import run_adversarial
+
+        report = run_adversarial(getattr(args, "task", None))
+        print("=" * 60)
+        print("FRONTIER ADVERSARIAL VETO PACK REPORT")
+        print("=" * 60)
+        print(f"Total Cases: {report['cases_tested']} | False Passes: {report['false_passes']}")
+        print(f"Overall Veto Success: {'PASS (All Rejected)' if report['all_vetoed'] else 'FAIL (Leak Detected)'}")
+        print("-" * 60)
+        for name, r in report["results"].items():
+            status = "REJECTED (OK)" if r["veto_successful"] else "LEAKED"
+            print(f"[{status}] {name:15}: {r['tier']} -> {r['violation']}")
+        return 0 if report["all_vetoed"] else 1
+
+    else:
+        print(f"unknown frontier subcommand: {subcmd!r}", file=sys.stderr)
+        return 2
+
+
+def cmd_colab(args: argparse.Namespace) -> int:
+    subcmd = getattr(args, "colab_cmd", "status")
+    if subcmd == "status":
+        import socket
+
+        port = args.port
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1.0)
+        is_open = False
+        try:
+            res = sock.connect_ex(("127.0.0.1", port))
+            is_open = (res == 0)
+        except Exception:
+            pass
+        finally:
+            sock.close()
+
+        print(f"Colab Bridge Status:")
+        print(f"  Local Port 127.0.0.1:{port}: {'ACTIVE' if is_open else 'NOT LISTENING'}")
+        print(f"  Ready for Colab MCP client connection.")
+        return 0
+
+    elif subcmd == "cell":
+        colab_code = (
+            "# --- TattvaSwarm Google Colab Quickstart Cell ---\n"
+            "# Run this cell in any Google Colab notebook (CPU or T4/L4 GPU)\n"
+            "!pip install uv\n"
+            "!git clone https://github.com/deliciosoradha/tattvaswarm.git /content/tattvaswarm 2>/dev/null || (cd /content/tattvaswarm && git pull)\n"
+            "%cd /content/tattvaswarm\n"
+            "!uv run --with numpy,pytest pytest tests/ -q\n"
+            "# Run all 5 frontier physical oracles through agent harness\n"
+            "!PYTHONPATH=src:meta_hackathon_2026:. uv run --with numpy python3 -m frontier_eval.agent_harness --task all --evidence-dir /content/evidence\n"
+            "# Verify sealed evidence manifest\n"
+            "!PYTHONPATH=src:meta_hackathon_2026:. uv run --with numpy python3 -m frontier_eval.agent_harness verify /content/evidence/tps\n"
+        )
+        print(colab_code)
+        return 0
+
+    else:
+        print(f"unknown colab subcommand: {subcmd!r}", file=sys.stderr)
+        return 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="tattva", description=f"TattvaSwarm {__version__} — sovereign personal AI swarm")
     parser.add_argument("--version", action="version", version=__version__)
@@ -256,6 +348,32 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_mcp = sub.add_parser("mcp", help="serve MCP tools over stdio (wait for a client)")
     p_mcp.set_defaults(func=cmd_mcp)
+
+    # Frontier commands
+    p_frontier = sub.add_parser("frontier", help="Frontier domain physical oracles and agent harness")
+    frontier_sub = p_frontier.add_subparsers(dest="frontier_cmd", required=True)
+
+    f_harness = frontier_sub.add_parser("harness", help="run agent harness (generates -> qualifies -> seals)")
+    f_harness.add_argument("--task", default="tps", help="scramjet, tps, lunar_power, rubisco, backtranslate, or all")
+    f_harness.add_argument("--evidence-dir", default="data/evidence/cli_run", help="evidence output directory")
+    f_harness.add_argument("--agent", choices=["default", "tattva"], default="tattva", help="agent generator")
+
+    f_verify = frontier_sub.add_parser("verify", help="verify sealed evidence directory")
+    f_verify.add_argument("evidence_dir", help="path to evidence directory")
+
+    f_adver = frontier_sub.add_parser("adversarial", help="run deterministic adversarial veto pack")
+    f_adver.add_argument("--task", default=None, help="optional specific task to test")
+    p_frontier.set_defaults(func=cmd_frontier)
+
+    # Colab commands
+    p_colab = sub.add_parser("colab", help="Google Colab bridge and connection utilities")
+    colab_sub = p_colab.add_subparsers(dest="colab_cmd", required=True)
+
+    c_status = colab_sub.add_parser("status", help="check status of local Colab bridge port")
+    c_status.add_argument("--port", type=int, default=9223, help="bridge port (default: 9223)")
+
+    colab_sub.add_parser("cell", help="output ready-to-paste Google Colab quickstart cell")
+    p_colab.set_defaults(func=cmd_colab)
 
     return parser
 

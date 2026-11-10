@@ -161,6 +161,7 @@ def run_pipeline(
     evidence_dir: pathlib.Path,
     agent_fn: Callable[[str, Dict[str, Any]], Dict[str, Any]] = default_agent,
     task_def: Optional[Dict[str, Any]] = None,
+    chain_file: Optional[pathlib.Path] = pathlib.Path("frontier_eval/runs/evaluation_chain.jsonl"),
 ) -> Dict[str, Any]:
     """Executes the full pipeline: Agent Generates -> Oracle Qualifies -> Evidence Shield Seals."""
     if task_name not in ORACLE_DISPATCH:
@@ -229,6 +230,31 @@ def run_pipeline(
     # 4. Evidence Shield Sealing (DharmaGate)
     manifest_res = compute_sha256_manifest(evidence_dir)
     lock_res = lock_evidence_directory(evidence_dir)
+
+    # 5. Append to Cryptographic Chained Ledger (evaluation_chain.jsonl)
+    if chain_file is not None:
+        chain_file.parent.mkdir(parents=True, exist_ok=True)
+        prev_sha = "0" * 64
+        if chain_file.exists() and chain_file.stat().st_size > 0:
+            last_line = chain_file.read_text(encoding="utf-8").strip().split("\n")[-1]
+            try:
+                prev_record = json.loads(last_line)
+                prev_sha = prev_record.get("sha256", prev_sha)
+            except Exception:
+                pass
+
+        record_data = {
+            "run_id": f"harness_{task_name}_{timestamp_utc.replace(':', '').replace('-', '')}",
+            "timestamp_utc": timestamp_utc,
+            "prev_sha256": prev_sha,
+            "bundle_manifest": manifest_res.get("manifest", {}),
+            "summary": {tier: 1},
+        }
+        record_bytes = json.dumps(record_data, sort_keys=True).encode("utf-8")
+        record_data["sha256"] = hashlib.sha256(record_bytes).hexdigest()
+
+        with chain_file.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record_data) + "\n")
 
     return {
         "task_name": task_name,

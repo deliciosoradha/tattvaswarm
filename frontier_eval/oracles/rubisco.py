@@ -44,6 +44,9 @@ EMIRICAL_PARETO_POINTS = [
 ]
 
 
+DEFAULT_PARETO_TOLERANCE_MARGIN = 0.05  # 5% experimental uncertainty allowance
+
+
 def max_empirical_kcat(sc_o: float) -> float:
     """Calculates the maximum turnover rate (s^-1) known across nature for a given specificity.
     Uses piecewise-linear interpolation across the empirical Pareto front from Flamholz 2019.
@@ -65,6 +68,7 @@ def max_empirical_kcat(sc_o: float) -> float:
 
 def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
     reasons: List[str] = []
+    pareto_margin = float(task.get("pareto_tolerance_margin", DEFAULT_PARETO_TOLERANCE_MARGIN))
 
     try:
         variants = answer.get("engineered_variants", [])
@@ -90,8 +94,7 @@ def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
             continue
 
         max_allowed_kcat = max_empirical_kcat(sc_o)
-        # 5% experimental error margin
-        threshold = max_allowed_kcat * 1.05
+        threshold = max_allowed_kcat * (1.0 + pareto_margin)
 
         if kcat > threshold:
             breached_variants.append({
