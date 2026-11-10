@@ -62,4 +62,35 @@ tectonic meta_hackathon_2026/paper_shiva_muse_verification.tex
 `META_API_KEY`, `BASETEN_API_KEY`, `META_MODEL_API_URL`, `BASETEN_API_URL`.
 
 ---
-*Tattva Swarm × Shiva Router — Push the Frontier submission. Pre-existing Triton kernels are baseline only; all files under `meta_hackathon_2026/` and `src/tattva_swarm/muse_bridge.py` are new hackathon work.*
+
+## 🚀 Production Engine: Treeseract, Gateway x402 & Base On-Chain Settlement
+
+### 1. Architectural Highlights
+* **Treeseract Executor (`frontier_eval/treeseract_executor.py`)**: Monte Carlo Tree Search (MCTS) combined with the Meru $Q_n$ hypercube bipartite topology ($g = i \oplus (i \gg 1)$). Prunes physical impossibilities via 5 domain oracles (Scramjet NACA 1135, TPS 1D transient, Lunar Power, Rubisco kinetics, and Reverse Translatase) and cryptographically seals winning trajectories with **DharmaGate** (`manifest.sha256` + `chmod 444`).
+* **FastAPI Production Gateway (`src/tattva_swarm/gateway/api.py`)**: Microservice serving `/api/v1/treeseract/search`, `/api/v1/frontier/eval`, `/api/v1/evidence/verify/{task}`, `/api/v1/mpp/invoice`, and `/api/v1/cdp/wallet`.
+* **x402 Micropayment Guard**: HTTP 402 middleware querying the live Base JSON-RPC (`eth_getTransactionReceipt`) to confirm USDC deposits before executing compute workloads, rejecting unconfirmed fake hashes immediately.
+* **On-Chain MPP Escrow (`contracts/MPPEscrow.sol`)**: Solidity ^0.8.20 smart contract compiled with `solc` (7,124 bytes bytecode) for holding USDC bounties released against verified DharmaGate evidence.
+* **Firebase Connector (`src/tattva_swarm/connectors/firebase_connector.py`)**: Synchronizes chained execution ledger to Firestore and Cloud Storage with local append-only fallback.
+
+### 2. Production CLI Commands
+```bash
+# Start HTTP Gateway server (port 8080)
+uv run tattva gateway serve --port 8080 --host 0.0.0.0
+
+# Run Treeseract hypercube search
+uv run tattva treeseract run --task tps --dimension 4 --depth 2
+
+# Check sovereign agent wallet & balance on Base Sepolia
+uv run tattva cdp wallet --network base-sepolia
+uv run tattva cdp balance --network base-sepolia
+
+# Deploy or simulate MPPEscrow on Base Sepolia
+uv run tattva cdp deploy-escrow --network base-sepolia
+
+# Check Firebase synchronization status
+uv run tattva firebase status
+```
+
+---
+*Tattva Swarm × Shiva Router — Push the Frontier & Sovereign Agentic Production Engine.*
+
