@@ -28,6 +28,7 @@
 | O-RUNNER | DharmaGate Evidence Runner | **Done** | evidence-shield, dharma | `chmod 444` + `manifest.sha256` + cadena JSONL SHA-256; bundles sellados |
 | O-HARNESS | Agent harness (genera → oráculo califica) | **Done** | shiva, meru, dharma | `agent_harness.py` cableado con TattvaSwarm agent + oráculos de dominio |
 | O-ADVERSARIAL | Adversarial pack (vetos deterministas) | **Done** | adversarial, shiva | Casos TPS/Rubisco/Reverse/Scramjet/Lunar con 100% de veto determinista; pytest PASS |
+| O-TREESERACT | Treeseract Executor (MCTS en hipercubo Q_n) | **Done** | treeseract, meru, shiva, dharma | Búsqueda MCTS proyectada en Q_n, poda física instantánea P1-P5, reformulación Shiva y sellado DharmaGate; 12/12 tests PASS |
 
 ---
 

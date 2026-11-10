@@ -277,6 +277,49 @@ def _tool_frontier_evidence_verify(args: dict) -> tuple[dict, bool]:
         return {"status": "error", "error": str(exc)}, True
 
 
+def _tool_frontier_treeseract_execute(args: dict) -> tuple[dict, bool]:
+    import pathlib
+    import tempfile
+    from frontier_eval.treeseract_executor import TreeseractExecutor
+
+    task_name = str(args.get("task", "tps")).lower().strip()
+    dimension = int(args.get("dimension", 4))
+    depth = int(args.get("depth", 2))
+    branch_factor = int(args.get("branch_factor", 3))
+    evidence_dir_str = args.get("evidence_dir")
+
+    try:
+        executor = TreeseractExecutor(
+            task_name=task_name,
+            dimension=dimension,
+            max_depth=depth,
+            branch_factor=branch_factor,
+        )
+        if evidence_dir_str:
+            evidence_dir = pathlib.Path(evidence_dir_str)
+            res = executor.run(evidence_dir=evidence_dir)
+        else:
+            with tempfile.TemporaryDirectory() as td:
+                res = executor.run(evidence_dir=pathlib.Path(td))
+
+        return {
+            "status": "ok",
+            "task": res.task_name,
+            "best_node_id": res.best_node_id,
+            "best_candidate": res.best_candidate,
+            "best_tier": res.best_tier,
+            "best_score": res.best_score,
+            "total_nodes": res.total_nodes,
+            "pruned_count": res.pruned_count,
+            "trajectory": res.trajectory,
+            "evidence_dir": res.evidence_dir,
+            "manifest_verdict": res.manifest_verdict,
+            "chain_sha256": res.chain_sha256,
+        }, False
+    except Exception as exc:
+        return {"status": "error", "error": str(exc)}, True
+
+
 def _tool_colab_bridge_status(args: dict) -> tuple[dict, bool]:
     import socket
     import urllib.request
@@ -476,6 +519,22 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "frontier_treeseract_execute",
+        "description": "Execute Treeseract Search (MCTS on Meru Q_n Hypercube) with first-principles domain oracle pruning, Shiva reformulation, and DharmaGate sealing.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "task": {"type": "string", "enum": ["scramjet", "tps", "lunar_power", "rubisco", "backtranslate"], "default": "tps"},
+                "dimension": {"type": "integer", "default": 4, "minimum": 2, "maximum": 10},
+                "depth": {"type": "integer", "default": 2, "minimum": 1, "maximum": 5},
+                "branch_factor": {"type": "integer", "default": 3, "minimum": 1, "maximum": 6},
+                "evidence_dir": {"type": "string", "description": "Optional evidence directory path to write sealed bundle"},
+            },
+            "required": ["task"],
+            "additionalProperties": False,
+        },
+    },
+    {
         "name": "colab_bridge_status",
         "description": "Inspect the Google Colab integration bridge status and get the ready-to-run Colab setup commands.",
         "inputSchema": {
@@ -502,6 +561,7 @@ _HANDLERS: dict[str, Callable[[dict], tuple[dict, bool]]] = {
     "frontier_oracle_eval": _tool_frontier_oracle_eval,
     "frontier_agent_harness": _tool_frontier_agent_harness,
     "frontier_evidence_verify": _tool_frontier_evidence_verify,
+    "frontier_treeseract_execute": _tool_frontier_treeseract_execute,
     "colab_bridge_status": _tool_colab_bridge_status,
 }
 

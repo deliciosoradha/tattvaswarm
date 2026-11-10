@@ -217,7 +217,39 @@ def cmd_frontier(args: argparse.Namespace) -> int:
         for name, r in report["results"].items():
             status = "REJECTED (OK)" if r["veto_successful"] else "LEAKED"
             print(f"[{status}] {name:15}: {r['tier']} -> {r['violation']}")
-        return 0 if report["all_vetoed"] else 1
+    elif subcmd == "treeseract":
+        import pathlib
+        from frontier_eval.treeseract_executor import TreeseractExecutor
+
+        task = getattr(args, "task", "tps")
+        dimension = getattr(args, "dimension", 4)
+        max_depth = getattr(args, "depth", 2)
+        branch_factor = getattr(args, "branch_factor", 3)
+        evidence_dir = pathlib.Path(args.evidence_dir) if getattr(args, "evidence_dir", None) else None
+
+        print(f"[*] Launching Treeseract Executor for `{task}` (Q_{dimension} Hypercube, Depth {max_depth})...")
+        executor = TreeseractExecutor(
+            task_name=task,
+            dimension=dimension,
+            max_depth=max_depth,
+            branch_factor=branch_factor,
+        )
+        res = executor.run(evidence_dir=evidence_dir)
+        print("=" * 60)
+        print(f"TREESERACT EXECUTION SUMMARY — {task.upper()}")
+        print("=" * 60)
+        print(f"Total Nodes Explored : {res.total_nodes}")
+        print(f"Pruned by Physics   : {res.pruned_count}")
+        print(f"Winning Node ID      : N{res.best_node_id}")
+        print(f"Winning Oracle Tier  : {res.best_tier}")
+        print(f"Physical Score       : {res.best_score:.4f}")
+        print(f"Trajectory           : {' -> '.join(f'N{n}' for n in res.trajectory)}")
+        print(f"Evidence Sealed At   : {res.evidence_dir}")
+        print(f"Manifest Integrity   : {res.manifest_verdict}")
+        if res.chain_sha256:
+            print(f"Chain SHA-256        : {res.chain_sha256}")
+        print("=" * 60)
+        return 0 if res.manifest_verdict in ("INTEGRITY_OK", "PASS") else 1
 
     else:
         print(f"unknown frontier subcommand: {subcmd!r}", file=sys.stderr)
@@ -363,7 +395,25 @@ def build_parser() -> argparse.ArgumentParser:
 
     f_adver = frontier_sub.add_parser("adversarial", help="run deterministic adversarial veto pack")
     f_adver.add_argument("--task", default=None, help="optional specific task to test")
+
+    f_tree = frontier_sub.add_parser("treeseract", help="run Treeseract Q_n tree search with domain oracle pruning")
+    f_tree.add_argument("--task", default="tps", help="scramjet, tps, lunar_power, rubisco, backtranslate")
+    f_tree.add_argument("--dimension", type=int, default=4, help="hypercube Q_n dimension (default: 4)")
+    f_tree.add_argument("--depth", type=int, default=2, help="search tree depth (default: 2)")
+    f_tree.add_argument("--branch-factor", type=int, default=3, help="branching factor per node (default: 3)")
+    f_tree.add_argument("--evidence-dir", default=None, help="optional evidence output directory")
     p_frontier.set_defaults(func=cmd_frontier)
+
+    # Top-level treeseract alias
+    p_tree_top = sub.add_parser("treeseract", help="run Treeseract Q_n tree search with domain oracle pruning")
+    p_tree_top_sub = p_tree_top.add_subparsers(dest="tree_subcmd", required=True)
+    t_run = p_tree_top_sub.add_parser("run", help="execute Treeseract search")
+    t_run.add_argument("--task", default="tps", help="scramjet, tps, lunar_power, rubisco, backtranslate")
+    t_run.add_argument("--dimension", type=int, default=4, help="hypercube Q_n dimension (default: 4)")
+    t_run.add_argument("--depth", type=int, default=2, help="search tree depth (default: 2)")
+    t_run.add_argument("--branch-factor", type=int, default=3, help="branching factor per node (default: 3)")
+    t_run.add_argument("--evidence-dir", default=None, help="optional evidence output directory")
+    p_tree_top.set_defaults(func=lambda a: cmd_frontier(argparse.Namespace(frontier_cmd="treeseract", **vars(a))))
 
     # Colab commands
     p_colab = sub.add_parser("colab", help="Google Colab bridge and connection utilities")
