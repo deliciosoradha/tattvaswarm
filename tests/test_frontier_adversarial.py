@@ -1,10 +1,12 @@
-"""Adversarial & Stress Tests for Ashta-Gate, Manifest Tampering, and UUIDv7.
+"""Adversarial & Stress Tests for Ashta-Gate, Manifest Tampering, UUIDv7, and Frontier Oracles.
 
 Evaluates:
-1. False-pass rate of Ashta-Gate against syntactically well-formed but factually false claims.
-2. DharmaGate tamper detection: Modifying 1 byte in a sealed evidence bundle breaks the manifest.
-3. UUIDv7 boundary cases: Maximum 48-bit timestamp, zero entropy, nil-like UUIDs.
-4. Physical CFL and divergence edge stress.
+1. False-pass rate of Ashta-Gate against ~50 syntactically well-formed but factually absurd claims.
+2. 100% Rejection rate of adversarial traps across all 5 physical domain oracles.
+3. DharmaGate tamper detection: Modifying 1 byte in a sealed evidence bundle triggers TAMPERING_DETECTED.
+4. Ledger cryptographic hash-chaining verification and tamper detection.
+5. UUIDv7 boundary cases: Maximum 48-bit timestamp, zero timestamp, prefix handling.
+6. Numerical divergence detection in TPS solver without silent clipping.
 """
 
 import hashlib
@@ -17,94 +19,147 @@ import uuid
 
 from meta_hackathon_2026.ashta_gate import evaluate as ashta_evaluate
 from meta_hackathon_2026.muse_session_bridge import decode_uuidv7
-from frontier_eval.runner import create_evidence_bundle
+from frontier_eval.runner import run_evaluation, verify_manifest
+from frontier_eval.oracles import scramjet, tps, lunar_power, rubisco, backtranslate
 
 
-# --- 1. Ashta-Gate False-Pass Stress Testing ---
+# --- 1. Ashta-Gate False-Pass Stress Testing (50 Synthetic Well-Formed False Claims) ---
 
-def test_ashta_gate_structural_false_pass_rate():
-    """Measures the false-pass rate of Ashta-Gate on factually absurd claims.
+def test_ashta_gate_structural_false_pass_rate_50_samples():
+    """Measures the false-pass rate of Ashta-Gate across 50 syntactically well-formed,
+    lexically overlapping, but scientifically impossible claims.
 
-    Since Ashta-Gate is a structural gate (verifying the presence of evidence,
-    falsifiability, alternatives, limits, and lexical overlap), well-formed
-    hallucinations/false claims WILL PASS. We explicitly measure and prove this limitation.
+    Ashta-Gate is a structural gate (evaluating evidence presence, falsifiability criteria,
+    alternatives considered, uncertainty bounds, and lexical overlap). Because it is not a wet-lab
+    truth oracle, well-formed structural artifacts will pass. This test quantifies the true rate.
     """
-    absurd_well_formed_claims = [
-        {
-            "question": "¿Puede un motor de agua generar antigravedad?",
-            "answer": "El motor de agua genera antigravedad mediante resonancia acústica.",
-            "claims": [{"text": "resonancia genera antigravedad", "evidence": "Experimento X laboratorio Y"}],
-            "assumptions": ["conservación de momento modificada"],
-            "alternatives": ["propulsión iónica", "propulsión magnética"],
-            "falsifiable_by": "aceleración neta menor a 1e-5 m/s2",
-            "uncertainty": 0.05,
-            "limits": "solo en vacío",
-        },
-        {
-            "question": "¿Puede la fotosíntesis producir oro elemental?",
-            "answer": "La fotosíntesis modificada transmuta plomo en oro elemental.",
-            "claims": [{"text": "transmutación biológica", "evidence": "Paper hipotético 2026"}],
-            "assumptions": ["reacciones nucleares de baja energía"],
-            "alternatives": ["fisión", "fusión"],
-            "falsifiable_by": "ausencia de espectrometría de masas",
-            "uncertainty": 0.1,
-            "limits": "rendimiento microscópico",
-        },
-        {
-            "question": "¿Es posible viajar más rápido que la luz con propulsión química?",
-            "answer": "La propulsión química supera la velocidad de la luz mediante túneles cuánticos macroscópicos.",
-            "claims": [{"text": "efecto túnel macroscópico", "evidence": "Simulación teórica Z"}],
-            "assumptions": ["materia exótica presente"],
-            "alternatives": ["cohete térmico", "vela solar"],
-            "falsifiable_by": "tiempo de vuelo superior a d/c",
-            "uncertainty": 0.08,
-            "limits": "solo a escala subatómica",
-        },
+    absurd_topics = [
+        ("motor de agua", "antigravedad acústica", "Experimento X laboratorio Y"),
+        ("fotosíntesis nuclear", "transmutación de plomo en oro", "Paper hipotético 2026"),
+        ("propulsión química FTL", "túnel cuántico macroscópico", "Simulación Z"),
+        ("batería de éter", "extracción de energía del vacío", "Patente hipotética"),
+        ("cristal de tiempo biológico", "reversión de entropía celular", "Ensayo sintético A"),
     ]
 
-    passed_count = 0
-    for claim in absurd_well_formed_claims:
-        res = ashta_evaluate(claim)
-        if res["verdict"] == "pass":
-            passed_count += 1
+    claims = []
+    for i in range(50):
+        topic, mechanism, source = absurd_topics[i % len(absurd_topics)]
+        question = f"¿Es viable el sistema {topic} variante {i} para generar {mechanism}?"
+        answer = f"El sistema {topic} variante {i} genera {mechanism} mediante resonancia comprobada en {source}."
+        claims.append({
+            "question": question,
+            "answer": answer,
+            "claims": [{"text": f"{topic} produce {mechanism}", "evidence": f"{source} registro #{i}"}],
+            "assumptions": ["conservación de simetría de norma CPT local"],
+            "alternatives": ["método convencional A", "método convencional B"],
+            "falsifiable_by": f"desviación experimental inferior a 1e-{i % 6 + 3} unidades",
+            "uncertainty": 0.05 + (i % 10) * 0.01,
+            "limits": f"válido únicamente bajo presión {i} mbar",
+        })
 
-    # Proves the documented limitation: structural gates pass well-formed false claims.
-    false_pass_rate = passed_count / len(absurd_well_formed_claims)
-    assert false_pass_rate > 0.66, f"Expected structural false-pass rate > 66%, got {false_pass_rate:.1%}"
+    passed_count = sum(1 for c in claims if ashta_evaluate(c)["verdict"] == "pass")
+    false_pass_rate = passed_count / len(claims)
+
+    # Documented structural property: well-formed claims pass structural checks at high rate (> 70%)
+    print(f"\n[Adversarial Metric] Ashta-Gate False-Pass Rate on 50 Absurd Claims: {false_pass_rate:.1%} ({passed_count}/50)")
+    assert false_pass_rate >= 0.70, f"Expected structural false-pass rate >= 70%, got {false_pass_rate:.1%}"
 
 
-# --- 2. DharmaGate Manifest Tamper Detection ---
+# --- 2. 100% Detection of Adversarial Traps Across Domain Oracles ---
 
-def test_dharmagate_tamper_detection():
-    """Verifies that altering 1 byte in a sealed evidence bundle invalidates the SHA-256 manifest."""
+def test_adversarial_traps_full_suite_rejection():
+    """Verifies that all 5 adversarial trap answers are strictly caught and rejected by the oracles.
+    0% false passes are permitted in the physical oracle suite.
+    """
+    tasks_dir = pathlib.Path("frontier_eval/tasks")
+    traps_file = tasks_dir / "answers_adversarial_traps.json"
+    assert traps_file.exists()
+
     with tempfile.TemporaryDirectory() as td:
         out_dir = pathlib.Path(td)
-        run_id = "test_tamper_run"
-        sample_results = {"task": "P1", "status": "VERIFIED", "value": 42}
+        res = run_evaluation(tasks_dir, traps_file, out_dir)
+        summary = res["summary"]
 
-        # 1. Create sealed evidence bundle
-        manifest = create_evidence_bundle(run_id, sample_results, out_dir)
-        bundle_dir = out_dir / run_id
+        assert summary["PROXY_PASS"] == 0, "Security Failure: Adversarial trap answer passed physical oracle!"
+        assert summary["FAIL_ORACLE"] == 4, f"Expected 4 FAIL_ORACLE, got {summary['FAIL_ORACLE']}"
+        assert summary["UNSUPPORTED_EXTRAORDINARY"] == 1, f"Expected 1 UNSUPPORTED_EXTRAORDINARY, got {summary['UNSUPPORTED_EXTRAORDINARY']}"
+
+
+# --- 3. DharmaGate Manifest Tamper Detection ---
+
+def test_dharmagate_tamper_detection():
+    """Verifies that modifying 1 byte in any file within a sealed evidence bundle
+    is flagged as TAMPERING_DETECTED by DharmaGate verify_manifest.
+    """
+    tasks_dir = pathlib.Path("frontier_eval/tasks")
+    ref_file = tasks_dir / "answers_reference.json"
+
+    with tempfile.TemporaryDirectory() as td:
+        out_dir = pathlib.Path(td)
+        eval_res = run_evaluation(tasks_dir, ref_file, out_dir)
+        bundle_dir = pathlib.Path(eval_res["bundle_dir"])
+
+        # 1. Clean verify must pass
+        clean_res = verify_manifest(bundle_dir)
+        assert clean_res["verdict"] == "INTEGRITY_OK"
+
+        # 2. Tamper: unlock file, alter 1 character in contract_results.json, and verify
         contract_path = bundle_dir / "contract_results.json"
-        manifest_path = bundle_dir / "manifest.sha256"
-
-        assert contract_path.exists()
-        assert manifest_path.exists()
-
-        # 2. Tamper: make writable, alter 1 byte in contract_results.json, and restore
         os.chmod(contract_path, 0o644)
-        original_bytes = contract_path.read_bytes()
-        tampered_bytes = original_bytes.replace(b"42", b"99")
-        contract_path.write_bytes(tampered_bytes)
+        orig_content = contract_path.read_text(encoding="utf-8")
+        tampered_content = orig_content.replace('"PROXY_PASS": 5', '"PROXY_PASS": 99')
+        contract_path.write_text(tampered_content, encoding="utf-8")
 
-        # 3. Verify that re-computed hash mismatches sealed manifest
-        recomputed_hash = hashlib.sha256(contract_path.read_bytes()).hexdigest()
-        recorded_hash = manifest["contract_results.json"]
+        # 3. Tampered verification must detect tampering
+        tamper_res = verify_manifest(bundle_dir)
+        assert tamper_res["verdict"] == "TAMPERING_DETECTED"
+        assert tamper_res["files"]["contract_results.json"]["status"] == "TAMPERED"
 
-        assert recomputed_hash != recorded_hash, "Tamper undetected: SHA-256 collision or unrecorded change"
+
+# --- 4. Ledger Cryptographic Hash-Chaining Test ---
+
+def test_ledger_hash_chaining():
+    """Verifies SHA-256 block chaining across sequential evaluation runs."""
+    tasks_dir = pathlib.Path("frontier_eval/tasks")
+    ref_file = tasks_dir / "answers_reference.json"
+
+    with tempfile.TemporaryDirectory() as td:
+        td_path = pathlib.Path(td)
+        out_dir = td_path / "bundles"
+        chain_file = td_path / "test_chain.jsonl"
+
+        # Run 1
+        run_evaluation(tasks_dir, ref_file, out_dir, chain_file)
+        # Run 2
+        run_evaluation(tasks_dir, ref_file, out_dir, chain_file)
+
+        lines = [json.loads(line) for line in chain_file.read_text(encoding="utf-8").strip().split("\n")]
+        assert len(lines) == 2
+        assert lines[0]["prev_sha256"] == "0" * 64
+        # Block 2 must point to Block 1's sha256
+        assert lines[1]["prev_sha256"] == lines[0]["sha256"]
 
 
-# --- 3. UUIDv7 Boundary Cases ---
+# --- 5. TPS Divergence / Edge Condition Handling ---
+
+def test_tps_divergence_detection():
+    """Verifies that an unphysical or divergent TPS simulation returns FAIL_ORACLE
+    rather than silently clipping or crashing with NaN.
+    """
+    # Extremely unphysical heat flux: 1e11 W/m^2 (nuclear fireball level)
+    task = {"limits": {"max_surface_T_K": 2500.0, "max_backside_T_K": 450.0, "max_areal_mass_kg_m2": 45.0}}
+    layers = [
+        {"material": "uhtc_zrb2_sic", "thickness_m": 0.001},
+        {"material": "aluminum_2024", "thickness_m": 0.001},
+    ]
+    sim = tps.simulate_1d_tps(layers, q_peak=1.0e11, t_pulse=100.0, t_total=100.0)
+    assert sim["diverged"] is True or sim["max_surface_T_K"] > 2500.0
+
+    eval_res = tps.evaluate(task, {"layers": layers})
+    assert eval_res["tier"] == "FAIL_ORACLE"
+
+
+# --- 6. UUIDv7 Boundary Cases ---
 
 def test_uuidv7_boundary_cases():
     """Tests RFC 9562 UUIDv7 decoder against extreme edge timestamps and formats."""

@@ -1,0 +1,39 @@
+{
+  "P1_scramjet": {
+    "ramp_angles_deg": [14.0, 14.0],
+    "phi": 0.95,
+    "trap_note": "Thermal choking expected due to excessive heat addition in decelerated flow"
+  },
+  "P2_tps": {
+    "layers": [
+      {
+        "material": "aluminum_2024",
+        "thickness_m": 0.001
+      },
+      {
+        "material": "titanium_grade5",
+        "thickness_m": 0.001
+      }
+    ],
+    "trap_note": "Uninsulated bare thin metal foils under 750 kW/m2 pulse will melt/exceed bondline"
+  },
+  "P3_lunar_power": {
+    "primary_night_tech": "li_ion_battery",
+    "total_system_mass_kg": 500.0,
+    "trap_note": "Mass claim of 500 kg for 14,160 kWh requirement is mathematically and physically impossible"
+  },
+  "P4_rubisco": {
+    "engineered_variants": [
+      {
+        "name": "Impossible_Miracle_Rubisco",
+        "S_C_O": 170.0,
+        "k_cat_C_s1": 5.0
+      }
+    ],
+    "trap_note": "Breaches empirical Pareto front of Flamholz 2019 dataset (S=170 requires vC <= 2.56 s^-1)"
+  },
+  "P5_backtranslate": {
+    "synthesized_dna": "ATGAAATGGGTGACCTTC",
+    "trap_note": "Severe truncation (missing 12 amino acids), must fail forward translation"
+  }
+}

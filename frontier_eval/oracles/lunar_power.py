@@ -3,29 +3,40 @@
 Baseline scenario:
   Location: Non-polar lunar surface (or equatorial ISRU outpost).
   Night duration: exactly 354 hours (14.75 Earth days).
-  Continuous electric load during night: P_night_kW (e.g. 50 kW base load).
-  Daytime load: P_day_kW (e.g. 100 kW with solar + recharging).
+  Day duration: 354 hours of sunlight for daytime load and storage recharge.
+  Continuous electric load during night: P_night_kW (e.g. 40 kW base load).
+  Daytime load: P_day_kW (e.g. 40 kW base load).
 
 Technologies evaluated:
-  1. Primary / Secondary Li-ion batteries (specific energy ~180-250 Wh/kg, round-trip eff ~0.90)
-  2. Regenerative Fuel Cell (RFC) — H2/O2 PEM stack + electrolyzer (specific energy ~450-800 Wh/kg system-level, round-trip eff ~0.50)
-  3. Fission Surface Power (FSP) — Kilopower / microreactor (continuous 40-100 kWe, specific mass ~40-60 kg/kWe, no night energy storage needed)
+  1. Primary / Secondary Li-ion batteries:
+     Specific energy ~200 Wh/kg cell level, DoD 80%, round-trip efficiency 90%.
+     Requires daytime solar array recharge.
+  2. Regenerative Fuel Cell (RFC) — H2/O2 PEM fuel cell + electrolyzer:
+     Specific energy ~600 Wh/kg system-level (tanks + cryo storage), DoD 95%,
+     round-trip efficiency 55%.
+     Fuel cell specific power 0.8 kW/kg; electrolyzer 0.6 kW/kg.
+     Requires daytime solar array recharge.
+  3. Fission Surface Power (FSP) — Kilopower / HEU/LEU Stirling microreactor:
+     Continuous 40-100 kWe, specific mass ~45 kg/kWe (Mason et al. NASA TM-2008-215264).
+     No energy storage or solar array required.
+
+Solar array baseline for storage recharging:
+  Specific power: 100 W/kg = 0.10 kW/kg (e.g., ROSA roll-out array / triple-junction GaAs).
 
 Oracle verification:
-  1. Energy balance equation closure: E_stored >= P_night * t_night / round_trip_eff
-  2. Mass budget arithmetic consistency: M_total = sum(components) strictly validated
-  3. Radiator rejection area: A_rad >= Q_reject / (eps * sigma * (T_rad^4 - T_sink^4))
-  4. Parasitic keep-alive thermal power check (electronics cannot drop below 230 K)
+  1. Energy balance equation closure: E_stored = P_night * t_night / round_trip_eff
+  2. Recharge power equation: P_recharge = E_stored / t_day
+  3. Total physical system mass computed and compared within 15% tolerance.
+  4. Launch mass limit check.
 """
 from __future__ import annotations
 
 import math
 from typing import Any, Dict, List
 
-SIGMA = 5.670374419e-8
-T_MOON_NIGHT_SINK = 100.0  # Kelvin (deep lunar night ambient effective temperature)
+SOLAR_SPECIFIC_POWER_KW_KG = 0.10  # 100 W/kg for space-grade roll-out solar arrays
 
-# Baseline physical properties
+# Baseline physical properties (references: NASA Kilopower TM-2008-215264, NASA RFC CR-2003-212351)
 TECH_SPECS = {
     "li_ion_battery": {
         "specific_energy_Wh_kg": 200.0,
@@ -50,23 +61,29 @@ TECH_SPECS = {
 def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
     req = task.get("requirements", {
         "p_night_kW": 40.0,
+        "p_day_kW": 40.0,
         "night_hours": 354.0,
-        "max_launch_mass_kg": 15000.0,
+        "day_hours": 354.0,
+        "max_launch_mass_kg": 25000.0,
     })
     reasons: List[str] = []
 
-    p_night = float(req["p_night_kW"])
-    t_night = float(req["night_hours"])
-    e_required_kWh = p_night * t_night  # Net energy required by base during night
+    p_night = float(req.get("p_night_kW", 40.0))
+    p_day = float(req.get("p_day_kW", p_night))
+    t_night = float(req.get("night_hours", 354.0))
+    t_day = float(req.get("day_hours", 354.0))
+    max_launch_mass = float(req.get("max_launch_mass_kg", 25000.0))
+
+    e_required_kWh = p_night * t_night  # Net energy required during night
 
     try:
         tech_choice = str(answer["primary_night_tech"]).lower().strip()
         claimed_mass_kg = float(answer["total_system_mass_kg"])
-        breakdown = answer.get("mass_breakdown_kg", {})
     except (KeyError, TypeError, ValueError) as exc:
         return {"tier": "UNPARSEABLE", "reasons": [f"Missing required fields: {exc}"]}
 
     oracle_mass_kg = 0.0
+    mass_components: Dict[str, float] = {}
 
     if tech_choice == "fission_surface_power":
         spec = TECH_SPECS["fission_surface_power"]
@@ -74,31 +91,54 @@ def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
         if rated_kW < p_night:
             reasons.append(f"Reactor rating {rated_kW} kWe < required night power {p_night} kWe")
         oracle_mass_kg = rated_kW * spec["specific_mass_kg_kWe"]
+        mass_components["reactor_mass_kg"] = round(oracle_mass_kg, 1)
 
     elif tech_choice == "li_ion_battery":
         spec = TECH_SPECS["li_ion_battery"]
         eff_cap = spec["specific_energy_Wh_kg"] * spec["depth_of_discharge"] * spec["round_trip_efficiency"] / 1000.0  # kWh/kg
-        oracle_mass_kg = e_required_kWh / eff_cap
+        storage_mass = e_required_kWh / eff_cap
+
+        # Daytime recharge solar array
+        e_recharge = e_required_kWh / spec["round_trip_efficiency"]
+        p_recharge = e_recharge / t_day
+        solar_power_kW = p_day + p_recharge
+        solar_array_mass = solar_power_kW / SOLAR_SPECIFIC_POWER_KW_KG
+
+        oracle_mass_kg = storage_mass + solar_array_mass
+        mass_components["battery_storage_mass_kg"] = round(storage_mass, 1)
+        mass_components["recharge_solar_mass_kg"] = round(solar_array_mass, 1)
 
     elif tech_choice == "regenerative_fuel_cell":
         spec = TECH_SPECS["regenerative_fuel_cell"]
         eff_cap = spec["specific_energy_Wh_kg"] * spec["depth_of_discharge"] * spec["round_trip_efficiency"] / 1000.0  # kWh/kg
-        reactant_mass = e_required_kWh / eff_cap
+        reactant_tank_mass = e_required_kWh / eff_cap
         fc_stack_mass = p_night / spec["fuel_cell_specific_power_kW_kg"]
-        oracle_mass_kg = reactant_mass + fc_stack_mass
+
+        # Daytime recharge solar array + electrolyzer
+        e_recharge = e_required_kWh / spec["round_trip_efficiency"]
+        p_recharge = e_recharge / t_day
+        electrolyzer_mass = p_recharge / spec["electrolyzer_specific_power_kW_kg"]
+        solar_power_kW = p_day + p_recharge
+        solar_array_mass = solar_power_kW / SOLAR_SPECIFIC_POWER_KW_KG
+
+        oracle_mass_kg = reactant_tank_mass + fc_stack_mass + electrolyzer_mass + solar_array_mass
+        mass_components["reactant_tank_mass_kg"] = round(reactant_tank_mass, 1)
+        mass_components["fc_stack_mass_kg"] = round(fc_stack_mass, 1)
+        mass_components["electrolyzer_mass_kg"] = round(electrolyzer_mass, 1)
+        mass_components["recharge_solar_mass_kg"] = round(solar_array_mass, 1)
 
     else:
         return {"tier": "FAIL_ORACLE", "reasons": [f"Unknown technology choice: {tech_choice}"]}
 
-    # Verify model's claimed mass matches physics within 10%
+    # Verify model's claimed mass matches physics within 15%
     rel_mass_err = abs(claimed_mass_kg - oracle_mass_kg) / max(oracle_mass_kg, 1.0)
     if rel_mass_err > 0.15:
         reasons.append(
-            f"Claimed mass {claimed_mass_kg:.1f} kg deviates {rel_mass_err:.1%} from physical oracle minimum {oracle_mass_kg:.1f} kg"
+            f"Claimed mass {claimed_mass_kg:.1f} kg deviates {rel_mass_err:.1%} (> 15% tolerance) from physical oracle baseline {oracle_mass_kg:.1f} kg"
         )
 
-    if claimed_mass_kg > req["max_launch_mass_kg"]:
-        reasons.append(f"System mass {claimed_mass_kg:.1f} kg exceeds lander payload capacity {req['max_launch_mass_kg']} kg")
+    if claimed_mass_kg > max_launch_mass:
+        reasons.append(f"System mass {claimed_mass_kg:.1f} kg exceeds lander payload capacity {max_launch_mass} kg")
 
     tier = "FAIL_ORACLE" if reasons else "PROXY_PASS"
     return {
@@ -107,4 +147,5 @@ def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
         "energy_required_kWh": round(e_required_kWh, 1),
         "oracle_minimum_mass_kg": round(oracle_mass_kg, 1),
         "claimed_mass_kg": round(claimed_mass_kg, 1),
+        "mass_components": mass_components,
     }

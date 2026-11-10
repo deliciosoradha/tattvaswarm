@@ -1,0 +1,44 @@
+{
+  "P1_scramjet": {
+    "ramp_angles_deg": [6.0, 6.0, 6.0],
+    "phi": 0.35
+  },
+  "P2_tps": {
+    "layers": [
+      {
+        "material": "uhtc_zrb2_sic",
+        "thickness_m": 0.003
+      },
+      {
+        "material": "silica_aerogel",
+        "thickness_m": 0.040
+      },
+      {
+        "material": "aluminum_2024",
+        "thickness_m": 0.003
+      }
+    ]
+  },
+  "P3_lunar_power": {
+    "primary_night_tech": "fission_surface_power",
+    "reactor_rated_kWe": 40.0,
+    "total_system_mass_kg": 1800.0
+  },
+  "P4_rubisco": {
+    "engineered_variants": [
+      {
+        "name": "Zea_mays_like",
+        "S_C_O": 78.0,
+        "k_cat_C_s1": 4.4
+      },
+      {
+        "name": "Griffithsia_like",
+        "S_C_O": 167.0,
+        "k_cat_C_s1": 2.6
+      }
+    ]
+  },
+  "P5_backtranslate": {
+    "synthesized_dna": "ATGAAATGGGTGACCTTCATCTCCCTGCTGTTCCTGTTCTCCTCCGCCTACTCCTAA"
+  }
+}

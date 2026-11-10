@@ -1,0 +1,16 @@
+{
+  "task_id": "P1_scramjet",
+  "domain": "aerospace_hypersonic_propulsion",
+  "description": "Quasi-1D scramjet inlet compression, Rayleigh heat addition, and expansion cycle",
+  "freestream": {
+    "mach": 6.0,
+    "T_K": 220.0,
+    "p_Pa": 2000.0
+  },
+  "limits": {
+    "min_combustor_mach": 1.2,
+    "max_combustor_static_T_K": 3000.0,
+    "burner_efficiency": 0.90
+  },
+  "required_keys": ["ramp_angles_deg", "phi"]
+}

@@ -1,0 +1,9 @@
+{
+  "task_id": "P5_backtranslate",
+  "domain": "molecular_biology_synthetic_biology",
+  "description": "De-novo peptide-to-nucleic acid reverse translation and codon selection",
+  "target_peptide": "MKWVTFISLLFLFSSAYS",
+  "gc_min_pct": 35.0,
+  "gc_max_pct": 65.0,
+  "required_keys": ["synthesized_dna"]
+}

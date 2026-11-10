@@ -1,0 +1,13 @@
+{
+  "task_id": "P3_lunar_power",
+  "domain": "space_architecture_energy",
+  "description": "Lunar surface power architecture trade-study for continuous 354-hour night base load and daytime recharge",
+  "requirements": {
+    "p_night_kW": 40.0,
+    "p_day_kW": 40.0,
+    "night_hours": 354.0,
+    "day_hours": 354.0,
+    "max_launch_mass_kg": 25000.0
+  },
+  "required_keys": ["primary_night_tech", "total_system_mass_kg"]
+}

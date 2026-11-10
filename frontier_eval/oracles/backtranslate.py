@@ -10,7 +10,7 @@ Oracle verification:
   2. The proposed DNA/RNA sequence must translate EXACTLY back to the target peptide
      using the Standard Genetic Code (NCBI translation table 1).
   3. No internal premature stop codons (*).
-  4. Codon Adaptation Index (CAI) or GC-content within host-compatible bounds (35% - 65%).
+  4. Codon Adaptation / GC-content within host-compatible bounds (default: 35% - 65%).
   5. The enzymatic mechanism is classified strictly as HYPOTHETICAL / THEORETICAL DESIGN,
      never certified as wet-lab functional (prevents false-positive overclaims).
 """
@@ -51,6 +51,8 @@ def translate_dna(dna: str) -> str:
 
 def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
     target_peptide = task.get("target_peptide", "MKWVTFISLLFLFSSAYS").upper().strip()
+    gc_min = float(task.get("gc_min_pct", 35.0))
+    gc_max = float(task.get("gc_max_pct", 65.0))
     reasons: List[str] = []
 
     try:
@@ -63,7 +65,6 @@ def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
 
     # Forward translation check
     translated = translate_dna(candidate_dna)
-    # Strip terminal stop codon if present
     clean_translated = translated.rstrip("*")
 
     if clean_translated != target_peptide:
@@ -77,8 +78,8 @@ def evaluate(task: Dict[str, Any], answer: Dict[str, Any]) -> Dict[str, Any]:
     # GC content check
     gc_count = candidate_dna.count("G") + candidate_dna.count("C")
     gc_pct = (gc_count / max(len(candidate_dna), 1)) * 100.0
-    if not (25.0 <= gc_pct <= 75.0):
-        reasons.append(f"GC content {gc_pct:.1f}% outside standard biophysical range (25-75%)")
+    if not (gc_min <= gc_pct <= gc_max):
+        reasons.append(f"GC content {gc_pct:.1f}% outside standard biophysical range ({gc_min:.0f}-{gc_max:.0f}%)")
 
     tier = "FAIL_ORACLE" if reasons else "PROXY_PASS"
     return {

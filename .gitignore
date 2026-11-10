@@ -10,3 +10,5 @@ logs/**/*.npz
 *.egg-info/
 session/*/resume_log.jsonl
 frontier_eval/runs/
+frontier_eval/evidence_bundles/
+*.out

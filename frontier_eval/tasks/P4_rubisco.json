@@ -1,0 +1,8 @@
+{
+  "task_id": "P4_rubisco",
+  "domain": "biochemistry_enzyme_engineering",
+  "description": "Rubisco specificity vs catalytic turnover rate Pareto trade-off evaluation against Flamholz 2019 dataset",
+  "data_reference": "flamholz2019_S2_merged.csv",
+  "data_sha256": "98839cbc53dbb4cad9b2b20ebdeaab5f821f1075d21214e56c0054588d54d480",
+  "required_keys": ["engineered_variants"]
+}

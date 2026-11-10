@@ -1,0 +1,16 @@
+{
+  "task_id": "P2_tps",
+  "domain": "aerospace_thermal_protection",
+  "description": "1D multi-layer transient thermal protection system (TPS) sizing for atmospheric entry pulse",
+  "heat_pulse": {
+    "q_peak_W_m2": 750000.0,
+    "t_pulse_s": 200.0,
+    "t_total_s": 600.0
+  },
+  "limits": {
+    "max_surface_T_K": 2500.0,
+    "max_backside_T_K": 450.0,
+    "max_areal_mass_kg_m2": 45.0
+  },
+  "required_keys": ["layers"]
+}
