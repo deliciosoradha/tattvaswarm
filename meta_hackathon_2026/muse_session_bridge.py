@@ -30,8 +30,12 @@ def decode_uuidv7(session_id: str = DEFAULT_RESUME_SESSION_ID) -> Dict[str, Any]
         clean_id = clean_id[len("chatcmpl-") :]
     u = uuid.UUID(clean_id)
     unix_ts_ms = u.int >> 80
-    dt = datetime.datetime.fromtimestamp(unix_ts_ms / 1000.0, tz=datetime.timezone.utc)
-    iso_utc = dt.strftime("%Y-%m-%dT%H:%M:%S.") + f"{unix_ts_ms % 1000:03d}Z"
+    try:
+        dt = datetime.datetime.fromtimestamp(unix_ts_ms / 1000.0, tz=datetime.timezone.utc)
+        iso_utc = dt.strftime("%Y-%m-%dT%H:%M:%S.") + f"{unix_ts_ms % 1000:03d}Z"
+    except (OverflowError, ValueError):
+        # Year > 9999 or out of range for standard datetime
+        iso_utc = f"+{unix_ts_ms // 1000}s (FAR_FUTURE_OR_MAX_TS)"
     return {
         "session_id": str(u),
         "version": u.version,
