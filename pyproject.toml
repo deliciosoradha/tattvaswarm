@@ -16,6 +16,16 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+gateway = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "httpx>=0.27.0",
+    "eth-account>=0.11.0",
+    "numpy>=1.26.0",
+]
+firebase = [
+    "firebase-admin>=6.5.0",
+]
 # Optional adapters — the core stays zero-dependency without these.
 langchain = ["langchain-core>=0.3"]
 

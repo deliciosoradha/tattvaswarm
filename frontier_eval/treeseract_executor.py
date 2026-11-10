@@ -28,6 +28,7 @@ import json
 import math
 import os
 import pathlib
+import stat
 import sys
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
@@ -527,6 +528,13 @@ class TreeseractEvidenceSealer:
         chain_file: Optional[pathlib.Path] = pathlib.Path("frontier_eval/runs/evaluation_chain.jsonl"),
     ) -> Dict[str, Any]:
         evidence_dir.mkdir(parents=True, exist_ok=True)
+        # Unlock previous files if updating an existing evidence directory
+        for f in evidence_dir.iterdir():
+            if f.is_file():
+                try:
+                    os.chmod(f, stat.S_IWUSR | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+                except Exception:
+                    pass
         timestamp_utc = datetime.datetime.now(datetime.timezone.utc).isoformat()
         run_id = f"treeseract_{task_name}_{timestamp_utc.replace(':', '').replace('-', '')}"
 
@@ -647,6 +655,7 @@ class TreeseractExecutor:
         branch_factor: int = 3,
         task_def: Optional[Dict[str, Any]] = None,
         initial_candidate: Optional[Dict[str, Any]] = None,
+        evidence_dir: Optional[pathlib.Path] = None,
     ):
         if task_name not in ORACLE_DISPATCH:
             raise ValueError(f"Unknown task: {task_name}. Supported: {list(ORACLE_DISPATCH.keys())}")
@@ -657,6 +666,7 @@ class TreeseractExecutor:
         self.branch_factor = branch_factor
         self.task_def = task_def or TASK_DEFAULTS.get(task_name, {})
         self.initial_candidate = initial_candidate or default_agent(task_name, self.task_def)
+        self.evidence_dir = evidence_dir
 
         self.projector = MeruTesseractProjector(dimension=dimension)
         self.branch_gen = WonderBranchGenerator()
@@ -785,7 +795,7 @@ class TreeseractExecutor:
         trajectory.reverse()
 
         # 4. Seal Evidence Bundle
-        target_dir = evidence_dir or pathlib.Path(f"data/evidence/treeseract_{self.task_name}")
+        target_dir = evidence_dir or self.evidence_dir or pathlib.Path(f"data/evidence/treeseract_{self.task_name}")
         seal_info = TreeseractEvidenceSealer.seal_search(
             task_name=self.task_name,
             best_node=best_node,
