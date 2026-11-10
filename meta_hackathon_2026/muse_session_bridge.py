@@ -67,6 +67,25 @@ def load_verified_traces(repo_root: Optional[pathlib.Path] = None) -> List[Dict[
     return []
 
 
+def _run_auditor() -> str:
+    """Execute auditor_estricto_meta.run_forensic_audit() for real and return its verdict."""
+    import contextlib
+    import io
+    import sys as _sys
+
+    root = str(_REPO_ROOT)
+    if root not in _sys.path:
+        _sys.path.insert(0, root)
+    try:
+        import auditor_estricto_meta  # type: ignore
+    except ImportError:
+        return "NOT_RUN (auditor_estricto_meta not importable)"
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        code = auditor_estricto_meta.run_forensic_audit(root)
+    return "VEREDICTO: APROBADO" if code == 0 else f"VEREDICTO: RECHAZADO (exit={code})"
+
+
 def _resolve_session_dir(
     session_id: str,
     session_dir: Optional[Any] = None,
@@ -99,8 +118,9 @@ def export_session_trajectory(
         if r.get("provider") == "Baseten_Open_Weights"
         or str(r.get("model", "")).startswith("meta-models/muse-spark-open")
     )
-    cum_spend = float(traces[-1].get("cumulative_meta_spend_usd", 0.024)) if traces else 0.024
+    cum_spend = float(traces[-1].get("cumulative_meta_spend_usd", 0.0)) if traces else 0.0
     reserve = float(traces[-1].get("untouched_reserve_usd", 50.0)) if traces else 50.0
+    audit_verdict = _run_auditor()
 
     pipe_cert = (
         (pipeline_result or {}).get("pipeline_certificate")
@@ -115,6 +135,8 @@ def export_session_trajectory(
         "headless_command": f"muse exec --session-id {clean_id}",
         "export_command": f"muse export --session {clean_id} --out trajectory.json",
         "status": "RESUMED_CHECKPOINT",
+        "muse_cli_state_restored": False,
+        "note": "Local deterministic checkpoint; no Meta Muse conversational state is restored without the muse CLI.",
         "verified_trace_count": len(traces),
         "meta_api_calls": meta_calls,
         "baseten_open_weight_calls": baseten_calls,
@@ -123,6 +145,7 @@ def export_session_trajectory(
             "untouched_reserve_usd": reserve,
             "hard_spend_cap_usd": 100.0,
         },
+        "forensic_audit": audit_verdict,
         "pipeline_certificate": pipe_cert,
     }
     traj_sha = hashlib.sha256(
@@ -133,8 +156,15 @@ def export_session_trajectory(
         "trajectory_sha256": traj_sha,
     }
 
+    # Append-only: every resume adds one line; existing checkpoint files are never overwritten.
+    log_path = target_dir / "resume_log.jsonl"
+    with log_path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps({"logged_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                            **trajectory_payload}, sort_keys=True) + "\n")
+
     traj_path = target_dir / "trajectory.json"
-    traj_path.write_text(json.dumps(trajectory_payload, indent=2) + "\n", encoding="utf-8")
+    if not traj_path.exists():
+        traj_path.write_text(json.dumps(trajectory_payload, indent=2) + "\n", encoding="utf-8")
 
     state_md = f"""# Session State
 
@@ -143,7 +173,7 @@ def export_session_trajectory(
 - CLI Resume Command: `muse resume {clean_id}`
 - Repo: {_REPO_ROOT}
 - Branch: hackathon-submit (Shiva-Muse × TattvaSwarm Integrated)
-- Status: RESUMED_AND_INTEGRATED
+- Status: RESUMED_LOCAL_CHECKPOINT (Muse CLI state restored: no)
 
 ## Goal
 Complete Meta Hackathon (Push the Frontier) integration of Tattva Swarm × Shiva-Muse Router,
@@ -151,14 +181,15 @@ wiring `rtk_shim`, `ashta_gate`, `wonder_dream`, `sam31_physics_injector`,
 `verifiable_agent_harness`, `sensor_xdp`, `shiva_muse_live_engine`, and Muse CLI session bridge.
 
 ## Current Status
-- Verified Partner Inference Trace: {len(traces)} live calls ({meta_calls} Meta_Model_API `01a1...` + {baseten_calls} Baseten_Open_Weights `meta-models/muse-spark-open`)
-- Budget Guardrail: ${cum_spend:.3f} cumulative spend / $100.00 active cap / ${reserve:.2f} untouched reserve
+- Verified Partner Inference Trace: {len(traces)} live calls ({meta_calls} Meta_Model_API + {baseten_calls} Baseten_Open_Weights)
+- Budget Guardrail: ${cum_spend:.3f} cumulative spend (COST_PER_1K estimate) / $100.00 active cap / ${reserve:.2f} untouched reserve
 - Pipeline Certificate: `{pipe_cert}`
 - Trajectory SHA-256: `{traj_sha}`
-- Forensic Audit (`auditor_estricto_meta.py`): VEREDICTO: APROBADO
+- Forensic Audit (`auditor_estricto_meta.py`, executed at export): {audit_verdict}
 """
     state_path = target_dir / "session_state.md"
-    state_path.write_text(state_md, encoding="utf-8")
+    if not state_path.exists():
+        state_path.write_text(state_md, encoding="utf-8")
 
     return {
         **trajectory_payload,

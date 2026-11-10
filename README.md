@@ -14,7 +14,7 @@ In strict compliance with Section 4 (*Hackathon Rules — New Work Only*), we ex
 | :--- | :--- | :--- |
 | `meta_hackathon_2026/shiva_muse_router.py` | **NEW (Built Oct 27 – Nov 4)** | Deterministic Meru-Piṅgala router integrating `muse-spark-1.3`, `meta-models/muse-spark-open-1026` (`meta-models/muse-spark-open`), `muse-spark-1.3-contributor`, `sam-3.1`, `muse-wonder-1.0`, and `muse-voice-transcribe-1.0` with a strict $100/$50 credit guardrail, `gated_dispatch()`, `full_muse_pipeline()`, and `resume_session()`. |
 | `meta_hackathon_2026/shiva_muse_live_engine.py` | **NEW (Built Oct 27 – Nov 4)** | Live HTTP inference client for `Meta_Model_API` (`https://api.meta.ai/v1`) and `Baseten_Open_Weights` (`https://inference.baseten.co/v1`) with `DRY_RUN_NO_KEY` fallback, `CreditLedger` integration, and SHA-256 partner trace logging. |
-| `meta_hackathon_2026/ashta_gate.py` & `sensor_xdp/loader.py` | **NEW (Built Oct 27 – Nov 4)** | Deterministic 8-aspect reasoning gate (*Pṛthvī, Jala, Agni, Vāyu, Ākāśa, Manas, Buddhi, Ahaṅkāra*) with SHA-256 certificate chaining and XDP/eBPF edge telemetry evidence ingestion. |
+| `meta_hackathon_2026/ashta_gate.py` & `sensor_xdp/loader.py` | **NEW (Built Oct 27 – Nov 4)** | Deterministic 8-aspect structural evidence gate (checks declared evidence/falsifiability, not factual truth) (*Pṛthvī, Jala, Agni, Vāyu, Ākāśa, Manas, Buddhi, Ahaṅkāra*) with SHA-256 certificate chaining and XDP/eBPF edge telemetry evidence ingestion. |
 | `meta_hackathon_2026/wonder_dream.py` & `rtk_shim.py` | **NEW (Built Oct 27 – Nov 4)** | Candidate dreaming (`dream_candidates`), Ashta-filtered manifestation (`manifest`), Shiva dance resolution (`shiva_dance_resolve`), 108M-state Gray-code emulation (`dream_emulate_108m`), and deterministic prompt deduplication/secret redaction (`rtk_shim`). |
 | `meta_hackathon_2026/sam31_physics_injector.py` | **NEW (Built Oct 27 – Nov 4)** | Pipeline converting `SAM 3.1` segmentation masks of atmospheric vortices and thermal shields into boundary tensors for Triton GPU kernels. |
 | `meta_hackathon_2026/verifiable_agent_harness.py` | **NEW (Built Oct 27 – Nov 4)** | Cryptographic invariant verifier implementing *Agents 102* verifiable reasoning certificates over `meta-models/muse-spark-open-1026` (`meta-models/muse-spark-open`). |
@@ -26,13 +26,18 @@ In strict compliance with Section 4 (*Hackathon Rules — New Work Only*), we ex
 ### Unified Architecture: `src/tattva_swarm/` × `meta_hackathon_2026/` & Session Bridge
 The repository unifies the core `src/tattva_swarm/` swarm platform (`SwarmRouter`, CLI, Conductor, LearningGate, MCP Server) with `meta_hackathon_2026/` via `tattva_swarm.muse_bridge.MuseSwarmAdapter`:
 * **End-to-End Muse Pipeline (`full_muse_pipeline`)**: Chains `rtk_shim.compress` (secret redaction + deduplication) → `ShivaMuseRouter` Meru-Piṅgala $Q_n$ Gray-code parity routing & `CreditLedger` → `wonder_dream` (`manifest` + `shiva_dance_resolve`) → `ashta_gate.evaluate` + `sensor_xdp.loader` → `sam31_physics_injector` + `verifiable_agent_harness.verify_rollout` → `shiva_muse_live_engine.chat`.
-* **Muse CLI Session Resumption (`muse resume 01a1c1c5-0154-7250-8767-f4beaff19eae`)**: Decodes UUIDv7 session `01a1c1c5-0154-7250-8767-f4beaff19eae` (`2026-11-09T19:24:36.052Z`), persists verifiable session checkpoints under `session/01a1c1c5-0154-7250-8767-f4beaff19eae/`, and invokes `muse resume` / `muse exec --session-id` when the `muse` CLI binary is present or resumes deterministically via `ShivaMuseRouter.resume_session()`.
+* **Muse CLI Session Resumption (`muse resume 01a1c1c5-0154-7250-8767-f4beaff19eae`)**: Decodes UUIDv7 session `01a1c1c5-0154-7250-8767-f4beaff19eae` (`2026-11-09T19:24:36.052Z`), persists append-only local checkpoints (no Meta-side state) under `session/01a1c1c5-0154-7250-8767-f4beaff19eae/`, and invokes `muse resume` / `muse exec --session-id` when the `muse` CLI binary is present or resumes deterministically via `ShivaMuseRouter.resume_session()`.
+
+### Honest Scope & Limitations (updated 2026-11-10)
+* **Ashta-Gate is a structural evidence gate, not a hallucination detector.** It scores whether a trace *declares* evidence, falsifiability, alternatives, assumptions and limits (plus lexical relevance). A false answer with well-formed fields passes. Factual correctness requires a domain oracle (see `frontier_eval/`).
+* **`muse resume 01a1c1c5-…` is a local deterministic checkpoint.** Without the `muse` CLI binary no Meta Muse conversational state is restored (`muse_cli_state_restored: false` in `trajectory.json`).
+* **Spend figures are estimates** from `COST_PER_1K`, not a billing export. Session verdicts are produced by actually executing `auditor_estricto_meta.py`.
 
 ### Project Wiki (`DOC-01`)
 All 5 documentation pages in `wiki/` are versioned and linked here:
 * [Wiki Home](wiki/Home.md) — Overview and live verification status table.
 * [Arquitectura](wiki/Arquitectura.md) — Shiva-Muse Router, Meru-Piṅgala $Q_n$ bipartite parity, $100/$50 credit ledger, and unified `src/tattva_swarm/` bridge.
-* [Ashta-Gate y Sensor XDP](wiki/Ashta-Gate-y-Sensor-XDP.md) — 8-aspect deterministic reasoning gate (`ashta_gate.py`) and observe-only eBPF/XDP edge anomaly counter (`sensor_xdp/loader.py`).
+* [Ashta-Gate y Sensor XDP](wiki/Ashta-Gate-y-Sensor-XDP.md) — 8-aspect structural evidence gate (`ashta_gate.py`) and observe-only eBPF/XDP edge anomaly counter (`sensor_xdp/loader.py`).
 * [Forense Samsara](wiki/Forense-Samsara.md) — Post-mortem of the HFT fleet and relaunch checklist.
 * [Reproducibilidad](wiki/Reproducibilidad.md) — Commands to verify tests, `auditor_estricto_meta.py` (`VEREDICTO: APROBADO.`), and hardware simulations.
 

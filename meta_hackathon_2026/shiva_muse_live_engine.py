@@ -108,7 +108,9 @@ def chat(
 
     if not key:
         sim_digest = hashlib.sha256(f"{resolved_provider}|{wire_model}|{prompt}".encode("utf-8")).hexdigest()
-        cum_spend = round(float(getattr(ledger, "current_spend_usd", 0.024) or 0.024), 6)
+        # Dry-run: no HTTP call happened, so no new spend. Report the ledger's
+        # real running total if one was passed, otherwise 0.0 (never a constant).
+        cum_spend = round(float(getattr(ledger, "current_spend_usd", 0.0) or 0.0), 6)
         reserve = round(float(getattr(ledger, "reserved_floor_usd", 50.0) or 50.0), 2)
         return {
             "mode": "DRY_RUN_NO_KEY",
@@ -143,17 +145,24 @@ def chat(
     dt = int((time.time() - t0) * 1000)
     d = json.loads(raw)
     usage = d.get("usage", {}) or {}
+    usage_estimated = not usage.get("total_tokens")
     total_tokens = int(usage.get("total_tokens", 0) or (len(prompt) // 4 + 32))
+    call_cost = 0.0 if use_baseten else (total_tokens / 1000.0) * cost_per_1k
 
     if ledger is not None:
-        call_cost = 0.0 if use_baseten else (total_tokens / 1000.0) * cost_per_1k
         if not use_baseten and not ledger.can_spend(call_cost):
             call_cost = 0.0
         ledger_entry = ledger.record_spend(d.get("model", wire_model), call_cost, total_tokens)
         cum_spend = ledger_entry["cumulative_spend_usd"]
         reserve = ledger_entry["untouched_reserve_usd"]
     else:
-        cum_spend = 0.024
+        # No ledger: continue the running total from the last trace line.
+        prev = 0.0
+        if ROOT_TRACE.exists():
+            lines = [l for l in ROOT_TRACE.read_text(encoding="utf-8").splitlines() if l.strip()]
+            if lines:
+                prev = float(json.loads(lines[-1]).get("cumulative_meta_spend_usd", 0.0) or 0.0)
+        cum_spend = round(prev + call_cost, 6)
         reserve = 50.0
 
     rec = {
@@ -164,6 +173,9 @@ def chat(
         "request_id": d.get("id"),
         "latency_ms": dt,
         "usage": usage,
+        "usage_estimated": usage_estimated,
+        "call_cost_usd": round(call_cost, 6),
+        "cost_source": "COST_PER_1K estimate (not billing export)",
         "response_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
         "cumulative_meta_spend_usd": cum_spend,
         "untouched_reserve_usd": reserve,

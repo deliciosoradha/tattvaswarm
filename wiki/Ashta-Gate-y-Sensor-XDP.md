@@ -11,6 +11,13 @@ la media ponderada cae bajo umbral. Cada veredicto se firma con el
 Shiva Router sigue siendo la esencia: la paridad decide el pool; el
 Ashta-Gate decide si la respuesta vive.
 
+> **Alcance real (2026-11-10):** la compuerta evalúa la *forma* de la traza
+> (evidencia declarada, falsabilidad, alternativas, supuestos, límites y
+> solape léxico), no la verdad del contenido. Una respuesta falsa con esos
+> campos bien llenos pasa. La verificación factual exige un oráculo de
+> dominio; ver `frontier_eval/` y la tasa de falsos pases medida en
+> `tests/test_frontier_adversarial.py`.
+
 Calibración pendiente (con datos, no a ojo): fijar umbrales con la
 distribución de veredictos ya registrada en la telemetría de flota,
 evitando el error histórico del veto al 99.87%.

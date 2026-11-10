@@ -8,3 +8,5 @@ logs/**/*.npz
 *.log
 .venv/
 *.egg-info/
+session/*/resume_log.jsonl
+frontier_eval/runs/
