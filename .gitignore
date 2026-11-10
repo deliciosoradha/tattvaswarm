@@ -12,3 +12,4 @@ session/*/resume_log.jsonl
 frontier_eval/runs/
 frontier_eval/evidence_bundles/
 *.out
+data/evidence/
