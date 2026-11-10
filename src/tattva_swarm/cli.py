@@ -299,6 +299,130 @@ def cmd_colab(args: argparse.Namespace) -> int:
         return 2
 
 
+def cmd_cdp(args: argparse.Namespace) -> int:
+    from .connectors.cdp_connector import CDPConnector
+
+    subcmd = getattr(args, "cdp_cmd", "wallet")
+    connector = CDPConnector()
+
+    if subcmd == "wallet":
+        network = getattr(args, "network", "base-mainnet")
+        wallet = connector.get_or_create_wallet(network)
+        print("=" * 60)
+        print("CDP / BASE SOVEREIGN AGENT WALLET")
+        print("=" * 60)
+        print(f"Address    : {wallet['address']}")
+        print(f"Network    : {wallet['network']} (Chain ID: {wallet['chain_id']})")
+        print(f"Provider   : {wallet.get('provider', 'CDP_Sovereign_AgentKit')}")
+        print(f"Created At : {wallet.get('created_at_utc')}")
+        print("=" * 60)
+        return 0
+
+    elif subcmd == "balance":
+        address = getattr(args, "address", None)
+        network = getattr(args, "network", "base-mainnet")
+        bal = connector.get_balance(address, network)
+        print("=" * 60)
+        print(f"WALLET BALANCE ({bal['network'].upper()})")
+        print("=" * 60)
+        print(f"Address      : {bal['address']}")
+        print(f"ETH Balance  : {bal['eth_balance']:.6f} ETH")
+        print(f"USDC Balance : {bal['usdc_balance']:.4f} USDC")
+        print(f"RPC Endpoint : {bal['rpc_endpoint']}")
+        print(f"RPC Live     : {'YES' if bal['rpc_connected'] else 'NO (Simulated/Offline)'}")
+        print("=" * 60)
+        return 0
+
+    elif subcmd == "faucet":
+        address = getattr(args, "address", None)
+        network = getattr(args, "network", "base-sepolia")
+        res = connector.request_faucet(address, network)
+        print("=" * 60)
+        print(f"BASE SEPOLIA FAUCET REQUEST")
+        print("=" * 60)
+        print(f"Recipient : {res['recipient']}")
+        print(f"Granted   : {res['granted_eth']} ETH + {res['granted_usdc']} USDC")
+        print(f"Tx Hash   : {res['tx_hash']}")
+        print(f"Status    : {res['status']}")
+        print("=" * 60)
+        return 0
+
+    elif subcmd == "pay":
+        cid = getattr(args, "challenge_id", "")
+        amount = float(getattr(args, "amount", 0.05))
+        recipient = getattr(args, "recipient", "0xDeliciosoRadhaTreasury")
+        res = connector.pay_x402_challenge(cid, amount, recipient)
+        print("=" * 60)
+        print("x402 PAYMENT EXECUTED")
+        print("=" * 60)
+        print(f"Challenge ID : {res['challenge_id']}")
+        print(f"Sender       : {res['sender']}")
+        print(f"Recipient    : {res['recipient']}")
+        print(f"Amount USDC  : {res['amount_usdc']:.4f}")
+        print(f"Tx Hash      : {res['tx_hash']}")
+        print(f"Auth Header  : {res['auth_header']}")
+        print("=" * 60)
+        return 0
+
+    else:
+        print(f"unknown cdp subcommand: {subcmd!r}", file=sys.stderr)
+        return 2
+
+
+def cmd_mpp(args: argparse.Namespace) -> int:
+    from .connectors.mpp_settlement import MPPSettlementEngine
+    import pathlib
+
+    subcmd = getattr(args, "mpp_cmd", "invoice")
+    engine = MPPSettlementEngine()
+
+    if subcmd == "invoice":
+        delegator = getattr(args, "delegator", "Agent-Orchestrator-01")
+        worker = getattr(args, "worker", "Agent-Oracle-Worker")
+        task = getattr(args, "task", "tps")
+        bounty = float(getattr(args, "bounty", 0.05))
+        inv = engine.create_invoice(delegator, worker, task, bounty)
+        print("=" * 60)
+        print("MPP A2A ESCROW INVOICE CREATED")
+        print("=" * 60)
+        print(f"Invoice ID : {inv.invoice_id}")
+        print(f"Delegator  : {inv.delegator_agent}")
+        print(f"Worker     : {inv.worker_agent}")
+        print(f"Task Name  : {inv.task_name}")
+        print(f"Bounty     : {inv.amount_usdc:.4f} USDC")
+        print(f"Status     : {inv.status}")
+        print(f"Condition  : {inv.condition}")
+        print("=" * 60)
+        return 0
+
+    elif subcmd == "settle":
+        inv_id = getattr(args, "invoice_id", "")
+        evidence_dir = pathlib.Path(getattr(args, "evidence_dir", "data/evidence/treeseract_tps"))
+        if inv_id not in engine._invoices:
+            inv = engine.create_invoice("Agent-Orchestrator-01", "Agent-Oracle-Worker", "tps", 0.05)
+            inv_id = inv.invoice_id
+
+        res = engine.settle_invoice_with_evidence(inv_id, evidence_dir)
+        print("=" * 60)
+        print(f"MPP SETTLEMENT VERDICT: {res['status']}")
+        print("=" * 60)
+        print(f"Invoice ID  : {res.get('invoice_id')}")
+        print(f"Oracle Tier : {res.get('tier')}")
+        print(f"Integrity   : {res.get('integrity_verdict')}")
+        if "release_tx" in res:
+            print(f"Release Tx  : {res.get('release_tx')}")
+            print(f"Recipient   : {res.get('payout_recipient')} ({res.get('amount_usdc')} USDC)")
+        elif "refund_tx" in res:
+            print(f"Refund Tx   : {res.get('refund_tx')}")
+            print(f"Dispute     : {res.get('dispute_reason')}")
+        print("=" * 60)
+        return 0 if res["status"] == "SETTLED_RELEASED" else 1
+
+    else:
+        print(f"unknown mpp subcommand: {subcmd!r}", file=sys.stderr)
+        return 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="tattva", description=f"TattvaSwarm {__version__} — sovereign personal AI swarm")
     parser.add_argument("--version", action="version", version=__version__)
@@ -424,6 +548,41 @@ def build_parser() -> argparse.ArgumentParser:
 
     colab_sub.add_parser("cell", help="output ready-to-paste Google Colab quickstart cell")
     p_colab.set_defaults(func=cmd_colab)
+
+    # CDP commands (Coinbase Developer Platform / Base Agent Wallet)
+    p_cdp = sub.add_parser("cdp", help="Coinbase Developer Platform & Base Agent Wallet utilities")
+    cdp_sub = p_cdp.add_subparsers(dest="cdp_cmd", required=True)
+
+    cdp_w = cdp_sub.add_parser("wallet", help="show or generate sovereign agent wallet")
+    cdp_w.add_argument("--network", default="base-mainnet", choices=["base-mainnet", "base-sepolia"])
+
+    cdp_b = cdp_sub.add_parser("balance", help="check ETH and USDC balance on Base")
+    cdp_b.add_argument("--address", default=None, help="wallet address (default: local agent wallet)")
+    cdp_b.add_argument("--network", default="base-mainnet", choices=["base-mainnet", "base-sepolia"])
+
+    cdp_f = cdp_sub.add_parser("faucet", help="request testnet drip on Base Sepolia")
+    cdp_f.add_argument("--address", default=None, help="wallet address (default: local agent wallet)")
+
+    cdp_p = cdp_sub.add_parser("pay", help="execute x402 payment challenge")
+    cdp_p.add_argument("--challenge-id", required=True, help="challenge ID (c_...)")
+    cdp_p.add_argument("--amount", type=float, default=0.05, help="USDC amount")
+    cdp_p.add_argument("--recipient", default="0xDeliciosoRadhaTreasury", help="recipient address")
+    p_cdp.set_defaults(func=cmd_cdp)
+
+    # MPP commands (Machine Payment Protocol for A2A settlement)
+    p_mpp = sub.add_parser("mpp", help="Machine Payment Protocol for autonomous A2A settlement")
+    mpp_sub = p_mpp.add_subparsers(dest="mpp_cmd", required=True)
+
+    mpp_inv = mpp_sub.add_parser("invoice", help="create A2A escrow invoice for subagent task")
+    mpp_inv.add_argument("--delegator", default="Agent-Orchestrator-01", help="delegator agent ID")
+    mpp_inv.add_argument("--worker", default="Agent-Oracle-Worker", help="worker agent ID")
+    mpp_inv.add_argument("--task", default="tps", help="task name")
+    mpp_inv.add_argument("--bounty", type=float, default=0.05, help="bounty in USDC")
+
+    mpp_set = mpp_sub.add_parser("settle", help="settle escrow against DharmaGate sealed evidence")
+    mpp_set.add_argument("--invoice-id", required=True, help="invoice ID (mpp_...)")
+    mpp_set.add_argument("--evidence-dir", default="data/evidence/treeseract_tps", help="sealed evidence directory")
+    p_mpp.set_defaults(func=cmd_mpp)
 
     return parser
 

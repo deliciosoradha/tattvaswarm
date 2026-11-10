@@ -356,6 +356,88 @@ def _tool_colab_bridge_status(args: dict) -> tuple[dict, bool]:
     return out, False
 
 
+def _tool_colab_cell_generate(args: dict) -> tuple[dict, bool]:
+    task = str(args.get("task", "all"))
+    colab_script = (
+        "# --- TattvaSwarm Google Colab Quickstart Cell ---\n"
+        "!pip install uv\n"
+        "!git clone https://github.com/deliciosoradha/tattvaswarm.git /content/tattvaswarm 2>/dev/null || (cd /content/tattvaswarm && git pull)\n"
+        "%cd /content/tattvaswarm\n"
+        "!uv run --with numpy,pytest pytest tests/ -q\n"
+        f"!PYTHONPATH=src:meta_hackathon_2026:. uv run --with numpy python3 -m frontier_eval.agent_harness --task {task} --evidence-dir /content/evidence\n"
+    )
+    return {"status": "ok", "task": task, "colab_cell": colab_script}, False
+
+
+def _tool_cdp_wallet_info(args: dict) -> tuple[dict, bool]:
+    from .connectors.cdp_connector import CDPConnector
+    net = str(args.get("network", "base-mainnet"))
+    connector = CDPConnector()
+    wallet = connector.get_or_create_wallet(net)
+    sanitized = {k: v for k, v in wallet.items() if k != "private_key"}
+    return {"status": "ok", "wallet": sanitized}, False
+
+
+def _tool_cdp_wallet_balance(args: dict) -> tuple[dict, bool]:
+    from .connectors.cdp_connector import CDPConnector
+    addr = args.get("address")
+    net = str(args.get("network", "base-mainnet"))
+    connector = CDPConnector()
+    bal = connector.get_balance(addr, net)
+    return {"status": "ok", "balance": bal}, False
+
+
+def _tool_cdp_pay_x402(args: dict) -> tuple[dict, bool]:
+    from .connectors.cdp_connector import CDPConnector
+    cid = str(args.get("challenge_id", "")).strip()
+    if not cid:
+        return {"status": "error", "error": "missing challenge_id"}, True
+    amount = float(args.get("amount", 0.05))
+    recip = str(args.get("recipient", "0xDeliciosoRadhaTreasury"))
+    connector = CDPConnector()
+    res = connector.pay_x402_challenge(cid, amount, recip)
+    return {"status": "ok", "payment": res}, False
+
+
+def _tool_mpp_create_invoice(args: dict) -> tuple[dict, bool]:
+    from .connectors.mpp_settlement import MPPSettlementEngine
+    delegator = str(args.get("delegator", "Agent-Orchestrator-01"))
+    worker = str(args.get("worker", "Agent-Oracle-Worker"))
+    task = str(args.get("task", "tps"))
+    bounty = float(args.get("bounty", 0.05))
+    engine = MPPSettlementEngine()
+    inv = engine.create_invoice(delegator, worker, task, bounty)
+    return {
+        "status": "ok",
+        "invoice": {
+            "invoice_id": inv.invoice_id,
+            "delegator": inv.delegator_agent,
+            "worker": inv.worker_agent,
+            "task": inv.task_name,
+            "amount_usdc": inv.amount_usdc,
+            "condition": inv.condition,
+            "status": inv.status,
+            "created_at_utc": inv.created_at_utc,
+        },
+    }, False
+
+
+def _tool_mpp_settle_invoice(args: dict) -> tuple[dict, bool]:
+    import pathlib
+    from .connectors.mpp_settlement import MPPSettlementEngine
+    inv_id = str(args.get("invoice_id", "")).strip()
+    if not inv_id:
+        return {"status": "error", "error": "missing invoice_id"}, True
+    evidence_dir = pathlib.Path(args.get("evidence_dir", "data/evidence/treeseract_tps"))
+    engine = MPPSettlementEngine()
+    if inv_id not in engine._invoices:
+        inv = engine.create_invoice("Agent-Orchestrator-01", "Agent-Oracle-Worker", "tps", 0.05)
+        inv_id = inv.invoice_id
+
+    res = engine.settle_invoice_with_evidence(inv_id, evidence_dir)
+    return {"status": "ok", "settlement": res}, False
+
+
 TOOLS: list[dict[str, Any]] = [
     {
         "name": "tattva_status",
@@ -546,6 +628,81 @@ TOOLS: list[dict[str, Any]] = [
             "additionalProperties": False,
         },
     },
+    {
+        "name": "colab_cell_generate",
+        "description": "Generate a runnable Google Colab cell script to bootstrap TattvaSwarm and execute frontier evaluations on Colab GPUs.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "task": {"type": "string", "default": "all", "description": "Specific task or all"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "cdp_wallet_info",
+        "description": "Inspect or generate sovereign Base Agent Wallet managed via Coinbase Developer Platform AgentKit.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "network": {"type": "string", "enum": ["base-mainnet", "base-sepolia"], "default": "base-mainnet"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "cdp_wallet_balance",
+        "description": "Query on-chain ETH and USDC balances on Base Mainnet or Sepolia via Base JSON-RPC.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "address": {"type": "string", "description": "Optional address to query, defaults to agent wallet"},
+                "network": {"type": "string", "enum": ["base-mainnet", "base-sepolia"], "default": "base-mainnet"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "cdp_pay_x402",
+        "description": "Execute an on-chain x402 payment challenge using the sovereign Base agent wallet.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "challenge_id": {"type": "string", "description": "The x402 challenge ID"},
+                "amount": {"type": "number", "default": 0.05, "description": "USDC amount"},
+                "recipient": {"type": "string", "default": "0xDeliciosoRadhaTreasury"},
+            },
+            "required": ["challenge_id"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "mpp_create_invoice",
+        "description": "Create an A2A Machine Payment Protocol (MPP) escrow invoice for subagent delegation.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "delegator": {"type": "string", "default": "Agent-Orchestrator-01"},
+                "worker": {"type": "string", "default": "Agent-Oracle-Worker"},
+                "task": {"type": "string", "default": "tps"},
+                "bounty": {"type": "number", "default": 0.05},
+            },
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "mpp_settle_invoice",
+        "description": "Settle an MPP escrow against DharmaGate sealed evidence (releases only on PROXY_PASS and INTEGRITY_OK).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "invoice_id": {"type": "string", "description": "MPP invoice ID to settle"},
+                "evidence_dir": {"type": "string", "default": "data/evidence/treeseract_tps"},
+            },
+            "required": ["invoice_id"],
+            "additionalProperties": False,
+        },
+    },
 ]
 
 _HANDLERS: dict[str, Callable[[dict], tuple[dict, bool]]] = {
@@ -563,6 +720,12 @@ _HANDLERS: dict[str, Callable[[dict], tuple[dict, bool]]] = {
     "frontier_evidence_verify": _tool_frontier_evidence_verify,
     "frontier_treeseract_execute": _tool_frontier_treeseract_execute,
     "colab_bridge_status": _tool_colab_bridge_status,
+    "colab_cell_generate": _tool_colab_cell_generate,
+    "cdp_wallet_info": _tool_cdp_wallet_info,
+    "cdp_wallet_balance": _tool_cdp_wallet_balance,
+    "cdp_pay_x402": _tool_cdp_pay_x402,
+    "mpp_create_invoice": _tool_mpp_create_invoice,
+    "mpp_settle_invoice": _tool_mpp_settle_invoice,
 }
 
 # ---------------------------------------------------------------------------
