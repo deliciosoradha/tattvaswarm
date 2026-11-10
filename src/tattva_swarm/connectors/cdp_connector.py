@@ -112,9 +112,9 @@ class CDPConnector:
             req = urllib.request.Request(
                 rpc_url,
                 data=json.dumps(req_payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
+                headers={"Content-Type": "application/json", "User-Agent": "TattvaSwarm-CDP/1.0"},
             )
-            with urllib.request.urlopen(req, timeout=2.0) as resp:
+            with urllib.request.urlopen(req, timeout=4.0) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 hex_val = data.get("result", "0x0")
                 eth_balance = int(hex_val, 16) / 1e18
@@ -122,10 +122,9 @@ class CDPConnector:
         except Exception:
             rpc_connected = False
 
-        # If live RPC is offline or address is new, report verified balance or simulated test funds
         if not rpc_connected:
-            eth_balance = 0.05  # Seeded testnet buffer
-            usdc_balance = 10.00  # Default test USDC buffer
+            eth_balance = 0.0
+            usdc_balance = 0.0
 
         return {
             "address": target_addr,

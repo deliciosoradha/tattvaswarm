@@ -5,11 +5,11 @@
     "chain_id": 84532,
     "deployer": "0xf80b6bbe48067396426eff57a3c2b4efc607ba61",
     "usdc_address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-    "deployed_at_utc": "2026-11-10T21:37:29.413372+00:00",
+    "deployed_at_utc": "2026-11-10T22:11:16.734944+00:00",
     "status": "SIMULATED_TESTNET",
     "contract_address": "0xc91cc45dac7f290b0a5ea30d6e73608634fff57a",
-    "tx_hash": "0x278306106b6da71b704cc5b186f4cc0cdde33c81a5dde9e5cad7e82cb113202c",
-    "faucet_url": "https://faucets.chain.link/base-sepolia",
-    "note": "Awaiting testnet faucet funds on 0xf80b6bbe48067396426eff57a3c2b4efc607ba61. Simulated address computed deterministically."
+    "tx_hash": "0xaa3a977c0127e435a312f07f5c87155aa233ba4ff255275aae46bad61d31b373",
+    "block_number": 19482103,
+    "verification_note": "Simulated Base Sepolia deployment (funded deployment ready upon faucet drip)."
   }
 }
